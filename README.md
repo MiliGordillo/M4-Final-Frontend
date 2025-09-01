@@ -32,5 +32,3 @@ Este proyecto es el frontend de una aplicación musical tipo Spotify, desarrolla
 ## Despliegue 
 - https://m4-final-frontend-a0zr.onrender.com
 
----
-¡Disfruta tu app musical!
