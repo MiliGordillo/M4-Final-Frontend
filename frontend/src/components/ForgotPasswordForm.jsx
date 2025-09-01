@@ -14,7 +14,7 @@ const ForgotPasswordForm = () => {
     console.log("Enviando email:", email); // <-- Verifica el valor
 
     try {
-      const res = await fetch("/api/auth/forgot-password", {
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

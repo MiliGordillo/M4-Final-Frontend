@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   // Función para obtener los datos del usuario
   const fetchUser = async (currentToken) => {
     try {
-      const res = await fetch("/api/auth/me", {
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${currentToken}` }
       });
       if (res.ok) {
