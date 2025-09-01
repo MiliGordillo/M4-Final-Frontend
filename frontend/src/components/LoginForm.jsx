@@ -12,11 +12,11 @@ const Login = () => {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleLogin = async (email, password) => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, password }),
+});
     if (res.ok) {
       const data = await res.json();
       login(data.token);

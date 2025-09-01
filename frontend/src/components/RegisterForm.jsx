@@ -17,9 +17,9 @@ export default function RegisterForm({ onRegister }) {
     setLoading(true);
     setError("");
     try {
-      await axios.post("/api/auth/register", { name, email, password });
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, { name, email, password });
       // Login automático tras registro
-      const res = await axios.post("/api/auth/login", { email, password });
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, { email, password });
       const { token } = res.data;
       login(token);
       onRegister && onRegister();
