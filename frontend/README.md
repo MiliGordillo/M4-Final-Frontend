@@ -1,12 +1,36 @@
-# React + Vite
+# M4-Final-Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto es el frontend de una aplicación musical tipo Spotify, desarrollado con React y Vite.
 
-Currently, two official plugins are available:
+## Características principales
+- Autenticación de usuarios (login, registro, recuperación y reseteo de contraseña)
+- Selección y gestión de perfiles
+- Búsqueda de canciones, artistas y álbumes
+- Creación y edición de playlists
+- Guardar artistas y álbumes favoritos
+- Interfaz moderna y responsiva
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tecnologías utilizadas
+- React
+- Vite
+- Axios
+- Context API
+- Tailwind CSS (o similar, según tu configuración)
 
-## Expanding the ESLint configuration
+## Estructura principal
+- `src/components/` — Componentes de UI y páginas
+- `src/context/` — Contextos de autenticación y perfil
+- `src/services/` — Servicios para llamadas a la API
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Notas
+- Asegúrate de tener el backend desplegado y accesible desde la URL configurada en `.env`.
+- El frontend está preparado para funcionar con un backend en Render.
+
+## Autoría
+- Proyecto realizado por MiliGordillo y colaboradores.
+
+## Despliegue 
+- https://m4-final-frontend-a0zr.onrender.com
+
+---
+¡Disfruta tu app musical!
