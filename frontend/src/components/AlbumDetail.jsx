@@ -17,7 +17,7 @@ export default function AlbumDetail({ albumId }) {
 
   const saveFavoriteAlbum = async () => {
     await axios.put(
-      `/api/profiles/${profile._id}/favorite-album`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-album`,
       { albumId },
       { headers: { Authorization: `Bearer ${token}` } }
     );

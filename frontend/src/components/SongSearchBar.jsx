@@ -30,7 +30,7 @@ export default function SongSearchBar({ onResults, onTypeChange }) {
     if (e) e.preventDefault();
     if (!query) return;
     const res = await fetch(
-      `/api/spotify/search?q=${encodeURIComponent(query)}&type=${type}`
+  `${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${encodeURIComponent(query)}&type=${type}`
     );
     const data = await res.json();
     onResults(data);
@@ -51,7 +51,7 @@ export default function SongSearchBar({ onResults, onTypeChange }) {
     onTypeChange(tabType);
     const term = getRandomTerm();
     const res = await fetch(
-      `/api/spotify/search?q=${encodeURIComponent(term)}&type=${tabType}`
+  `${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${encodeURIComponent(term)}&type=${tabType}`
     );
     const data = await res.json();
     onResults(data);

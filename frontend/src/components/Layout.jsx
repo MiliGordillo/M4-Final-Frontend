@@ -22,7 +22,7 @@ const Layout = ({ children }) => {
   useEffect(() => {
     if (!isAuthenticated || !token) return;
     axios
-      .get("/api/profiles", { headers: { Authorization: `Bearer ${token}` } })
+      .get(`${import.meta.env.VITE_BACKEND_URL}/api/profiles`, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => setProfiles(res.data))
       .catch(() => setProfiles([]));
   }, [isAuthenticated, token, location.pathname]);

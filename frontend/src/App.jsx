@@ -39,7 +39,7 @@ const SongCatalogContainer = () => {
     if (!hasSearched) {
       setLoading(true);
       const term = getRandomTerm();
-      fetch(`/api/spotify/search?q=${term}&type=${type}`)
+  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${term}&type=${type}`)
         .then(res => res.json())
         .then(data => {
           setSongs(data);

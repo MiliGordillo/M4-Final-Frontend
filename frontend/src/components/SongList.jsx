@@ -19,7 +19,7 @@ export default function SongList({ songs, type, loading }) {
     const fetchPlaylists = async () => {
       if (!profile) return;
       try {
-        const res = await axios.get(`/api/playlists/${profile._id}`, {
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPlaylists(res.data);
@@ -34,7 +34,7 @@ export default function SongList({ songs, type, loading }) {
   const fetchFavorites = async () => {
     if (!profile) return;
     try {
-      const res = await axios.get(`/api/profiles/${profile._id}`, {
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFavoriteArtists(res.data.favoriteArtists || []);
@@ -75,12 +75,12 @@ export default function SongList({ songs, type, loading }) {
 
     if (!pl.songs.some(s => s.spotifyId === modalSong.id)) {
       await axios.put(
-        `/api/playlists/edit/${selectedPlaylist}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/playlists/edit/${selectedPlaylist}`,
         { name: pl.name, songs: [...(pl.songs || []), songData] },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // Refrescar playlists del backend
-      const res = await axios.get(`/api/playlists/${profile._id}`, {
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPlaylists(res.data);
@@ -95,7 +95,7 @@ export default function SongList({ songs, type, loading }) {
     if (isArtistFavorite(artist.id)) return;
     try {
       await axios.put(
-        `/api/profiles/${profile._id}/favorite-artist`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-artist`,
         { artist },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -110,7 +110,7 @@ export default function SongList({ songs, type, loading }) {
     if (isAlbumFavorite(album.id)) return;
     try {
       await axios.put(
-        `/api/profiles/${profile._id}/favorite-album`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-album`,
         { album },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -125,12 +125,12 @@ export default function SongList({ songs, type, loading }) {
     if (!newPlaylistName.trim()) return;
     try {
       await axios.post(
-        `/api/playlists/${profile._id}`,
+  `${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`,
         { name: newPlaylistName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // Refrescar playlists
-      const res = await axios.get(`/api/playlists/${profile._id}`, {
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPlaylists(res.data);

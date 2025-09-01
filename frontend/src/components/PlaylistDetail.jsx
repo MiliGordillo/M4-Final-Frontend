@@ -19,7 +19,7 @@ export default function PlaylistDetail({ playlistId }) {
   const handleFavorite = async () => {
     try {
       await axios.put(
-        `/api/profiles/${profile._id}/favorite-artist`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-artist`,
         { artistId: playlist.owner.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );

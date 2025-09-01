@@ -43,7 +43,7 @@ useEffect(() => {
   const fetchProfiles = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/api/profiles", {
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/profiles`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -53,7 +53,7 @@ useEffect(() => {
           if (!avatar || typeof avatar !== "string" || !avatar.trim().startsWith("<svg")) {
             avatar = createAvatar(avataaars, { seed: p.name || "profile" }).toString();
             try {
-              await axios.put(`/api/profiles/${p._id}`, { avatar }, {
+              await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/profiles/${p._id}`, { avatar }, {
                 headers: { Authorization: `Bearer ${token}` },
               });
             } catch {
@@ -90,11 +90,11 @@ useEffect(() => {
         : createAvatar(avataaars, { seed: form.name || "profile" }).toString();
 
       if (editId) {
-        await axios.put(`/api/profiles/${editId}`, { ...form, avatar }, {
+  await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/profiles/${editId}`, { ...form, avatar }, {
           headers: { Authorization: `Bearer ${token}` },
         });
       } else {
-        await axios.post("/api/profiles", { ...form, avatar }, {
+  await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/profiles`, { ...form, avatar }, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -120,7 +120,7 @@ useEffect(() => {
   const handleDelete = async (id) => {
     if (!window.confirm("¿Seguro que deseas eliminar este perfil?")) return;
     try {
-      await axios.delete(`/api/profiles/${id}`, {
+  await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/profiles/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchProfiles();

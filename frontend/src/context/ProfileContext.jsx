@@ -34,7 +34,7 @@ function useFavoriteActions(profile) {
 
   const saveFavoriteArtist = async (artistId) => {
     const res = await axios.put(
-      `/api/profiles/${profile._id}/favorite-artist`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-artist`,
       { artistId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -43,7 +43,7 @@ function useFavoriteActions(profile) {
 
   const saveFavoriteAlbum = async (albumId) => {
     const res = await axios.put(
-      `/api/profiles/${profile._id}/favorite-album`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-album`,
       { albumId },
       { headers: { Authorization: `Bearer ${token}` } }
     );

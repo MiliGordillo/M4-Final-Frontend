@@ -10,7 +10,7 @@ export default function Profile() {
 
   useEffect(() => {
     if (profile?._id) {
-      fetch(`/api/profiles/${profile._id}`, {
+  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())

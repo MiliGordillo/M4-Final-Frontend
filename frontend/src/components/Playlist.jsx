@@ -36,7 +36,7 @@ export default function Playlist() {
     if (!profile) return;
     setLoading(true);
     try {
-      const res = await axios.get(`/api/playlists/${profile._id}`, {
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPlaylists(res.data);
@@ -64,13 +64,13 @@ export default function Playlist() {
     try {
       if (editId) {
         await axios.put(
-          `/api/playlists/edit/${editId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/playlists/edit/${editId}`,
           { name: form.name },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          `/api/playlists/${profile._id}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`,
           { name: form.name },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -86,7 +86,7 @@ export default function Playlist() {
   const handleDelete = async (id) => {
     if (!window.confirm("¿Seguro que deseas eliminar esta playlist?")) return;
     try {
-      await axios.delete(`/api/playlists/delete/${id}`, {
+  await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchPlaylists();
@@ -102,7 +102,7 @@ export default function Playlist() {
     setSearchLoading(true);
     setHasSearchedSpotify(true);
     try {
-      const res = await axios.get("/api/spotify/search", {
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/spotify/search`, {
         params: { q: searchTerm, type: "playlist", limit: 12 },
       });
       setSpotifyPlaylists(res.data.playlists?.items || []);
@@ -118,7 +118,7 @@ export default function Playlist() {
     e.preventDefault();
     setGlobalLoading(true);
     try {
-      const res = await axios.get("/api/playlists", {
+  const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/playlists`, {
         params: { search: globalSearchTerm },
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -135,7 +135,7 @@ export default function Playlist() {
     try {
       // 1. Obtener los tracks de la playlist de Spotify desde tu backend
       const tracksRes = await axios.get(
-        `/api/spotify/playlist/${pl.id}/tracks`,
+  `${import.meta.env.VITE_BACKEND_URL}/api/spotify/playlist/${pl.id}/tracks`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -149,7 +149,7 @@ export default function Playlist() {
 
       // 3. Guardar la playlist con las canciones
       await axios.post(
-        `/api/playlists/${profile._id}`,
+  `${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`,
         {
           name: pl.name,
           songs: tracks,
@@ -169,7 +169,7 @@ export default function Playlist() {
   const handleRemoveSong = async (playlistId, songId) => {
     if (!window.confirm("¿Seguro que deseas eliminar esta canción?")) return;
     try {
-      await axios.delete(`/api/playlists/${playlistId}/song/${songId}`, {
+  await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/${playlistId}/song/${songId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchPlaylists();
@@ -329,7 +329,7 @@ export default function Playlist() {
                     <button
                       onClick={async () => {
                         await axios.post(
-                          `/api/playlists/${profile._id}`,
+                          `${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`,
                           {
                             name:
                               pl.name +
