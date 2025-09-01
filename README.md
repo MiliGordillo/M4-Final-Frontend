@@ -22,10 +22,6 @@ Este proyecto es el frontend de una aplicación musical tipo Spotify, desarrolla
 - `src/context/` — Contextos de autenticación y perfil
 - `src/services/` — Servicios para llamadas a la API
 
-## Notas
-- Asegúrate de tener el backend desplegado y accesible desde la URL configurada en `.env`.
-- El frontend está preparado para funcionar con un backend en Render.
-
 ## Autoría
 - Proyecto realizado por MiliGordillo y colaboradores.
 
