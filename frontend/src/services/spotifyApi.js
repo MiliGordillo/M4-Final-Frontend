@@ -1,4 +1,4 @@
-const API_BASE = '/api/spotify';
+const API_BASE = `${import.meta.env.VITE_BACKEND_URL}/api/spotify`;
 
 export async function getTrack(id) {
   const res = await fetch(`${API_BASE}/track/${id}`);
