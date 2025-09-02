@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
 
 export default function SongList({ songs, type, loading }) {
-  const { darkMode } = useContext(ThemeContext);
   const [playlists, setPlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [modalSong, setModalSong] = useState(null);
@@ -153,37 +152,37 @@ export default function SongList({ songs, type, loading }) {
   }
 
   return (
-    <div className={darkMode ? "bg-[#181818] text-white min-h-screen" : "bg-white text-black min-h-screen"}>
-      <h2 className={"text-3xl font-bold mb-8 " + (darkMode ? "text-[#A8DADC]" : "text-green-400")}>Catálogo</h2>
+    <div>
+      <h2 className="text-3xl font-bold mb-8 text-green-400">Catálogo</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8">
         {/* Canciones */}
         {type === "track" && songs.map(song => (
-          <div key={song.id} className={"flex flex-col items-center group " + (darkMode ? "bg-[#232323]" : "bg-[#F7F7F7]") + " rounded-xl p-2"}>
+          <div key={song.id} className="flex flex-col items-center group">
             <img
               src={song.album?.images?.[0]?.url || "https://via.placeholder.com/150"}
               alt={song.name}
               className="w-36 h-36 rounded-xl object-cover mb-3 transition-transform group-hover:scale-105"
             />
-            <h3 className={"text-base font-semibold text-center truncate w-36 " + (darkMode ? "text-[#A8DADC]" : "text-green-700]")}>{song.name}</h3>
-            <p className={"text-xs text-center truncate w-36 " + (darkMode ? "text-gray-300" : "text-gray-600")}>{song.artists?.map(a => a.name).join(", ")}</p>
+            <h3 className="text-base font-semibold text-white text-center truncate w-36">{song.name}</h3>
+            <p className="text-xs text-gray-300 text-center truncate w-36">{song.artists?.map(a => a.name).join(", ")}</p>
             <button
-              className={"mt-2 px-4 py-1 font-bold rounded-full text-xs transition " + (darkMode ? "bg-[#A8DADC] text-[#2C2C2C] hover:bg-[#FFC1CC]" : "bg-green-500 hover:bg-green-400 text-white")}
+              className="mt-2 px-4 py-1 bg-green-500 hover:bg-green-400 text-white font-bold rounded-full text-xs transition"
               onClick={() => setModalSong(song)}
             >Agregar a Playlist</button>
           </div>
         ))}
         {/* Artistas */}
         {type === "artist" && songs.map(artist => (
-          <div key={artist.id} className={"flex flex-col items-center group " + (darkMode ? "bg-[#232323]" : "bg-[#F7F7F7]") + " rounded-xl p-2"}>
+          <div key={artist.id} className="flex flex-col items-center group">
             <img
               src={artist.images?.[0]?.url || "https://via.placeholder.com/150"}
               alt={artist.name}
               className="w-36 h-36 rounded-full object-cover mb-3 transition-transform group-hover:scale-105"
             />
-            <h3 className={"text-base font-semibold text-center truncate w-36 " + (darkMode ? "text-[#A8DADC]" : "text-green-700]")}>{artist.name}</h3>
-            <p className={"text-xs text-center truncate w-36 " + (darkMode ? "text-gray-300" : "text-gray-600")}>{artist.genres?.[0]}</p>
+            <h3 className="text-base font-semibold text-white text-center truncate w-36">{artist.name}</h3>
+            <p className="text-xs text-gray-300 text-center truncate w-36">{artist.genres?.[0]}</p>
             <button
-              className={`mt-2 px-4 py-1 rounded-full font-bold text-xs transition ${isArtistFavorite(artist.id) ? (darkMode ? "bg-gray-700 text-[#A8DADC]" : "bg-gray-500 text-white") : (darkMode ? "bg-[#A8DADC] text-[#2C2C2C] hover:bg-[#FFC1CC]" : "bg-green-500 hover:bg-green-400 text-white")}`}
+              className={`mt-2 px-4 py-1 rounded-full font-bold text-xs transition ${isArtistFavorite(artist.id) ? "bg-gray-500 text-white" : "bg-green-500 hover:bg-green-400 text-white"}`}
               onClick={() => handleAddArtistFavorite(artist)}
               disabled={isArtistFavorite(artist.id)}
             >
@@ -193,16 +192,16 @@ export default function SongList({ songs, type, loading }) {
         ))}
         {/* Álbumes */}
         {type === "album" && songs.map(album => (
-          <div key={album.id} className={"flex flex-col items-center group " + (darkMode ? "bg-[#232323]" : "bg-[#F7F7F7]") + " rounded-xl p-2"}>
+          <div key={album.id} className="flex flex-col items-center group">
             <img
               src={album.images?.[0]?.url || "https://via.placeholder.com/150"}
               alt={album.name}
               className="w-36 h-36 rounded-xl object-cover mb-3 transition-transform group-hover:scale-105"
             />
-            <h3 className={"text-base font-semibold text-center truncate w-36 " + (darkMode ? "text-[#A8DADC]" : "text-green-700]")}>{album.name}</h3>
-            <p className={"text-xs text-center truncate w-36 " + (darkMode ? "text-gray-300" : "text-gray-600")}>{album.artists?.map(a => a.name).join(", ")}</p>
+            <h3 className="text-base font-semibold text-white text-center truncate w-36">{album.name}</h3>
+            <p className="text-xs text-gray-300 text-center truncate w-36">{album.artists?.map(a => a.name).join(", ")}</p>
             <button
-              className={`mt-2 px-4 py-1 rounded-full font-bold text-xs transition ${isAlbumFavorite(album.id) ? (darkMode ? "bg-gray-700 text-[#A8DADC]" : "bg-gray-500 text-white") : (darkMode ? "bg-[#A8DADC] text-[#2C2C2C] hover:bg-[#FFC1CC]" : "bg-green-500 hover:bg-green-400 text-white")}`}
+              className={`mt-2 px-4 py-1 rounded-full font-bold text-xs transition ${isAlbumFavorite(album.id) ? "bg-gray-500 text-white" : "bg-green-500 hover:bg-green-400 text-white"}`}
               onClick={() => handleAddAlbumFavorite(album)}
               disabled={isAlbumFavorite(album.id)}
             >
@@ -214,29 +213,16 @@ export default function SongList({ songs, type, loading }) {
 
       {/* Modal para agregar a playlist (solo para canciones) */}
       {modalSong && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50 animate-fadeIn"
-          style={{
-            background: darkMode
-              ? 'linear-gradient(120deg, rgba(34,193,195,0.15) 0%, rgba(45,0,90,0.85) 100%)'
-              : 'linear-gradient(120deg, rgba(168,218,220,0.25) 0%, rgba(179,156,208,0.7) 100%)',
-            backdropFilter: 'blur(6px)'
-          }}
-        >
-          <div
-            className={
-              (darkMode
-                ? "bg-gradient-to-br from-[#232323] via-[#181818] to-[#232323] border-[#A8DADC]"
-                : "bg-gradient-to-br from-white via-[#E4E4E4] to-white border-[#B39CD0]") +
-              " bg-opacity-95 p-8 rounded-3xl shadow-2xl w-[380px] border-2"
-            }
-            style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}
-          >
-            <h3 className={"text-2xl font-bold mb-4 " + (darkMode ? "text-[#A8DADC]" : "text-green-400")}>Agregar canción</h3>
-            <p className={"mb-4 font-semibold " + (darkMode ? "text-[#A8DADC]" : "text-green-700")}>{modalSong.name} <span className={darkMode ? "text-white" : "text-black"}>-</span> <span className={darkMode ? "text-[#A8DADC]" : "text-green-400"}>{modalSong.artists?.map(a => a.name).join(", ")}</span></p>
+        <div className="fixed inset-0 flex items-center justify-center z-50 animate-fadeIn" style={{
+          background: 'linear-gradient(120deg, rgba(34,193,195,0.25) 0%, rgba(45,0,90,0.7) 100%)',
+          backdropFilter: 'blur(6px)'
+        }}>
+          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 bg-opacity-95 p-8 rounded-3xl shadow-2xl w-[380px] border-2 border-green-400" style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}>
+            <h3 className="text-2xl font-bold text-green-300 mb-4">Agregar canción</h3>
+            <p className="text-green-200 mb-4 font-semibold">{modalSong.name} <span className="text-white">-</span> <span className="text-green-400">{modalSong.artists?.map(a => a.name).join(", ")}</span></p>
 
             <select
-              className={"px-3 py-2 rounded-lg w-full focus:outline-none focus:ring-2 mb-2 border " + (darkMode ? "bg-[#181818] text-white focus:ring-[#A8DADC] border-[#A8DADC]" : "bg-white text-black focus:ring-[#B39CD0] border-[#B39CD0]")}
+              className="px-3 py-2 rounded-lg bg-gray-900 text-white w-full focus:outline-none focus:ring-2 focus:ring-green-500 mb-2 border border-green-400"
               value={selectedPlaylist}
               onChange={e => setSelectedPlaylist(e.target.value)}
             >
@@ -253,7 +239,7 @@ export default function SongList({ songs, type, loading }) {
             {/* Botón para mostrar input de crear playlist */}
             {!showCreate ? (
               <button
-                className={"mb-4 text-xs underline transition " + (darkMode ? "text-[#A8DADC] hover:text-[#B39CD0]" : "text-green-400 hover:text-green-300")}
+                className="mb-4 text-xs text-green-400 underline hover:text-green-300 transition"
                 type="button"
                 onClick={() => setShowCreate(true)}
               >
@@ -263,21 +249,21 @@ export default function SongList({ songs, type, loading }) {
               <div className="flex items-center gap-2 mb-4">
                 <input
                   type="text"
-                  className={"px-2 py-1 rounded border focus:outline-none " + (darkMode ? "bg-[#232323] text-white border-[#A8DADC]" : "bg-white text-black border-[#B39CD0]")}
+                  className="px-2 py-1 rounded bg-gray-800 text-white border border-green-400 focus:outline-none"
                   placeholder="Nombre de la playlist"
                   value={newPlaylistName}
                   onChange={e => setNewPlaylistName(e.target.value)}
                   autoFocus
                 />
                 <button
-                  className={"px-3 py-1 rounded transition text-xs " + (darkMode ? "bg-[#A8DADC] text-[#2C2C2C] hover:bg-[#FFC1CC]" : "bg-green-500 hover:bg-green-400 text-white")}
+                  className="px-3 py-1 bg-green-500 hover:bg-green-400 text-white rounded transition text-xs"
                   type="button"
                   onClick={handleCreatePlaylist}
                 >
                   Crear
                 </button>
                 <button
-                  className={"px-2 py-1 rounded transition text-xs " + (darkMode ? "bg-gray-700 hover:bg-gray-800 text-[#A8DADC]" : "bg-gray-600 hover:bg-gray-700 text-white")}
+                  className="px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded transition text-xs"
                   type="button"
                   onClick={() => { setShowCreate(false); setNewPlaylistName(""); }}
                 >
@@ -288,14 +274,14 @@ export default function SongList({ songs, type, loading }) {
 
             <div className="flex gap-3 justify-end mt-2">
               <button
-                className={"px-5 py-2 font-bold rounded-lg transition text-lg shadow " + (darkMode ? "bg-[#A8DADC] text-[#2C2C2C] hover:bg-[#FFC1CC]" : "bg-green-500 hover:bg-green-400 text-black")}
+                className="px-5 py-2 bg-green-500 hover:bg-green-400 text-black font-bold rounded-lg transition text-lg shadow"
                 onClick={handleAddSong}
                 disabled={!selectedPlaylist || isSongInPlaylist(modalSong.id, selectedPlaylist)}
               >
                 Agregar
               </button>
               <button
-                className={"px-5 py-2 rounded-lg transition text-lg shadow " + (darkMode ? "bg-red-700 hover:bg-red-800 text-white" : "bg-red-500 hover:bg-red-400 text-white")}
+                className="px-5 py-2 bg-red-500 hover:bg-red-400 text-white rounded-lg transition text-lg shadow"
                 onClick={() => setModalSong(null)}
               >
                 Cancelar
