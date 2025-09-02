@@ -3,8 +3,6 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
 
-
-
 // Ruta protegida para usuarios autenticados y con perfil seleccionado
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();

@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
 import { Search, Loader2, PlusCircle, XCircle } from "lucide-react";
 
 export default function Playlist() {
+  const { darkMode } = useContext(ThemeContext);
   const { token } = useAuth();
   const { profile } = useProfile();
 
+  // Log de depuración seguro: muestra el valor de profile y role cada vez que cambia el perfil
+  React.useEffect(() => {
+    console.log("[Playlist.jsx][useEffect] profile:", profile);
+    console.log("[Playlist.jsx][useEffect] profile.role:", profile?.role);
+  }, [profile]);
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,6 +37,13 @@ export default function Playlist() {
 
   // Active tab state
   const [activeTab, setActiveTab] = useState("spotify"); // "spotify" o "comunidad"
+
+  // Si el perfil es child, forzar la pestaña comunidad
+  useEffect(() => {
+    if (profile?.type === "child") {
+      setActiveTab("comunidad");
+    }
+  }, [profile]);
 
   // --- Fetch mis playlists ---
   const fetchPlaylists = async () => {
@@ -132,10 +146,14 @@ export default function Playlist() {
 
   // --- Add Spotify Playlist ---
   const handleAddSpotifyPlaylist = async (pl) => {
+    if (profile?.type === "child") {
+      alert("No tienes permiso para importar playlists de Spotify.");
+      return;
+    }
     try {
       // 1. Obtener los tracks de la playlist de Spotify desde tu backend
       const tracksRes = await axios.get(
-  `${import.meta.env.VITE_BACKEND_URL}/api/spotify/playlist/${pl.id}/tracks`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/spotify/playlist/${pl.id}/tracks`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -149,7 +167,7 @@ export default function Playlist() {
 
       // 3. Guardar la playlist con las canciones
       await axios.post(
-  `${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`,
         {
           name: pl.name,
           songs: tracks,
@@ -181,7 +199,10 @@ export default function Playlist() {
   // --- Render ---
   if (loading)
     return (
-      <div className="flex flex-col items-center justify-center min-h-[40vh] text-green-400 animate-pulse">
+      <div className={
+        "flex flex-col items-center justify-center min-h-[40vh] animate-pulse " +
+        (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+      }>
         <Loader2 className="w-6 h-6 animate-spin mb-2" />
         Cargando playlists...
       </div>
@@ -189,35 +210,59 @@ export default function Playlist() {
 
   if (error)
     return (
-      <div className="flex flex-col items-center justify-center min-h-[40vh] text-red-500 font-semibold">
+      <div className={
+        "flex flex-col items-center justify-center min-h-[40vh] font-semibold " +
+        (darkMode ? "text-red-400" : "text-red-600")
+      }>
         {error}
       </div>
     );
 
   return (
-    <div className="relative max-w-7xl mx-auto px-4 md:px-10 py-10">
+    <div
+      className={
+        "relative max-w-7xl mx-auto px-4 md:px-10 py-10 transition-colors duration-300 " +
+        (darkMode ? "bg-[#121212] text-white" : "bg-white text-[#191414]")
+      }
+    >
       {/* Botón flotante para abrir sidebar */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className="fixed z-40 bottom-8 right-8 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg p-4 flex items-center gap-2 transition"
+        className={
+          "fixed z-40 bottom-8 right-8 rounded-full shadow-lg p-4 flex items-center gap-2 transition font-semibold " +
+          (darkMode
+            ? "bg-[#1DB954] text-[#191414] hover:bg-[#191414] hover:text-[#1DB954]"
+            : "bg-[#191414] text-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414]")
+        }
         title="Buscar playlists en Spotify o Comunidad"
       >
         <Search size={22} />
-        <span className="hidden md:inline font-semibold">Buscar playlists</span>
+        <span className="hidden md:inline">Buscar playlists</span>
       </button>
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-black/95 shadow-2xl z-50 transform transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={
+          `fixed top-0 right-0 h-full w-full max-w-md shadow-2xl z-50 transform transition-transform duration-300 ` +
+          (sidebarOpen ? "translate-x-0 " : "translate-x-full ") +
+          (darkMode ? "bg-[#191414]/95" : "bg-[#1DB954]/10 backdrop-blur")
+        }
         style={{ backdropFilter: "blur(8px)" }}
       >
-        <div className="flex justify-between items-center p-6 border-b border-green-900">
-          <h2 className="text-2xl font-bold text-green-400">Buscar playlists</h2>
+        <div className={
+          "flex justify-between items-center p-6 border-b " +
+          (darkMode ? "border-[#1DB954]/30" : "border-[#191414]/30")
+        }>
+          <h2 className={
+            "text-2xl font-bold " +
+            (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+          }>Buscar playlists</h2>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="text-gray-300 hover:text-red-400 transition"
+            className={
+              "transition " +
+              (darkMode ? "text-gray-300 hover:text-red-400" : "text-[#191414] hover:text-red-600")
+            }
             title="Cerrar"
           >
             <XCircle size={28} />
@@ -225,49 +270,69 @@ export default function Playlist() {
         </div>
         <div className="p-6 overflow-y-auto h-[calc(100vh-80px)]">
           <div className="flex justify-center gap-2 mb-6">
+            {/* Solo mostrar la pestaña Spotify si el perfil no es child */}
+            {profile?.type !== "child" && (
+              <button
+                className={
+                  `px-4 py-2 rounded-full font-semibold transition ` +
+                  (activeTab === "spotify"
+                    ? (darkMode ? "bg-[#1DB954] text-[#191414]" : "bg-[#191414] text-[#1DB954]")
+                    : (darkMode ? "bg-[#282828] text-[#1DB954]" : "bg-[#1DB954]/10 text-[#191414]"))
+                }
+                onClick={() => setActiveTab("spotify")}
+              >
+                Spotify
+              </button>
+            )}
             <button
-              className={`px-4 py-2 rounded-full font-semibold transition ${
-                activeTab === "spotify"
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-800 text-green-300"
-              }`}
-              onClick={() => setActiveTab("spotify")}
-            >
-              Spotify
-            </button>
-            <button
-              className={`px-4 py-2 rounded-full font-semibold transition ${
-                activeTab === "comunidad"
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-800 text-green-300"
-              }`}
+              className={
+                `px-4 py-2 rounded-full font-semibold transition ` +
+                (activeTab === "comunidad"
+                  ? (darkMode ? "bg-[#1DB954] text-[#191414]" : "bg-[#191414] text-[#1DB954]")
+                  : (darkMode ? "bg-[#282828] text-[#1DB954]" : "bg-[#1DB954]/10 text-[#191414]"))
+              }
               onClick={() => setActiveTab("comunidad")}
             >
               Comunidad
             </button>
           </div>
 
-          {activeTab === "spotify" ? (
+          {/* Solo mostrar el bloque de Spotify si el perfil no es child */}
+          {activeTab === "spotify" && profile?.role !== "child" ? (
             <>
               {/* Formulario y resultados de búsqueda de Spotify */}
               <form onSubmit={handleSpotifySearch} className="mb-6">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Search className={
+                    "absolute left-4 top-1/2 -translate-y-1/2 " +
+                    (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+                  } />
                   <input
                     type="text"
-                    className="w-full pl-12 pr-4 py-3 rounded-full bg-gray-900 text-white placeholder-gray-400 border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-400 outline-none"
+                    className={
+                      "w-full pl-12 pr-4 py-3 rounded-full border outline-none transition " +
+                      (darkMode
+                        ? "bg-[#282828] text-white placeholder-gray-400 border-[#1DB954] focus:ring-2 focus:ring-[#1DB954]"
+                        : "bg-white text-[#191414] placeholder-gray-500 border-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+                    }
                     placeholder="Buscar playlists en Spotify"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                   {searchLoading && (
-                    <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-green-400" />
+                    <Loader2 className={
+                      "absolute right-4 top-1/2 -translate-y-1/2 animate-spin " +
+                      (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+                    } />
                   )}
                 </div>
               </form>
               <div className="grid gap-4 mb-8">
                 {!hasSearchedSpotify ? null : spotifyPlaylists.length === 0 ? (
-                  <p className="text-gray-400 text-center col-span-full">
+                  <p className={
+                    "text-center col-span-full " +
+                    (darkMode ? "text-gray-400" : "text-gray-500")
+                  }>
                     No se encontraron playlists de Spotify.
                   </p>
                 ) : (
@@ -276,20 +341,36 @@ export default function Playlist() {
                     .map((pl) => (
                       <div
                         key={pl.id}
-                        className="bg-gradient-to-br from-green-900/40 to-black rounded-xl shadow p-3 flex flex-col items-center"
+                        className={
+                          "rounded-xl shadow p-3 flex flex-col items-center transition " +
+                          (darkMode
+                            ? "bg-gradient-to-br from-[#1DB954]/10 to-[#191414]"
+                            : "bg-gradient-to-br from-[#1DB954]/20 to-white")
+                        }
                       >
                         <img
                           src={pl.images?.[0]?.url || "https://via.placeholder.com/120"}
                           alt={pl.name}
                           className="w-20 h-20 rounded-lg object-cover mb-2 shadow"
                         />
-                        <p className="font-bold text-green-400 text-center">{pl.name}</p>
-                        <p className="text-xs text-gray-400 text-center mb-2">
+                        <p className={
+                          "font-bold text-center " +
+                          (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+                        }>{pl.name}</p>
+                        <p className={
+                          "text-xs text-center mb-2 " +
+                          (darkMode ? "text-gray-400" : "text-gray-600")
+                        }>
                           {pl.owner?.display_name || "Desconocido"}
                         </p>
                         <button
                           onClick={() => handleAddSpotifyPlaylist(pl)}
-                          className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-full shadow transition"
+                          className={
+                            "px-3 py-1 text-xs font-semibold rounded-full shadow transition " +
+                            (darkMode
+                              ? "bg-[#1DB954] text-[#191414] hover:bg-[#191414] hover:text-[#1DB954]"
+                              : "bg-[#191414] text-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414]")
+                          }
                         >
                           ➕ Agregar
                         </button>
@@ -303,16 +384,27 @@ export default function Playlist() {
               {/* Formulario y resultados de búsqueda de Comunidad */}
               <form onSubmit={handleGlobalSearch} className="mb-6">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Search className={
+                    "absolute left-4 top-1/2 -translate-y-1/2 " +
+                    (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+                  } />
                   <input
                     type="text"
-                    className="w-full pl-12 pr-4 py-3 rounded-full bg-gray-900 text-white placeholder-gray-400 border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-400 outline-none"
+                    className={
+                      "w-full pl-12 pr-4 py-3 rounded-full border outline-none transition " +
+                      (darkMode
+                        ? "bg-[#282828] text-white placeholder-gray-400 border-[#1DB954] focus:ring-2 focus:ring-[#1DB954]"
+                        : "bg-white text-[#191414] placeholder-gray-500 border-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+                    }
                     placeholder="Buscar playlists de otros usuarios"
                     value={globalSearchTerm}
                     onChange={(e) => setGlobalSearchTerm(e.target.value)}
                   />
                   {globalLoading && (
-                    <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-green-400" />
+                    <Loader2 className={
+                      "absolute right-4 top-1/2 -translate-y-1/2 animate-spin " +
+                      (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+                    } />
                   )}
                 </div>
               </form>
@@ -320,10 +412,21 @@ export default function Playlist() {
                 {globalPlaylists.map((pl) => (
                   <div
                     key={pl._id}
-                    className="bg-gradient-to-br from-green-900/40 to-black rounded-xl shadow p-3 flex flex-col items-center"
+                    className={
+                      "rounded-xl shadow p-3 flex flex-col items-center transition " +
+                      (darkMode
+                        ? "bg-gradient-to-br from-[#1DB954]/10 to-[#191414]"
+                        : "bg-gradient-to-br from-[#1DB954]/20 to-white")
+                    }
                   >
-                    <p className="font-bold text-green-400">{pl.name}</p>
-                    <p className="text-xs text-gray-400 mb-2">
+                    <p className={
+                      "font-bold " +
+                      (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+                    }>{pl.name}</p>
+                    <p className={
+                      "text-xs mb-2 " +
+                      (darkMode ? "text-gray-400" : "text-gray-600")
+                    }>
                       Creada por: {pl.profile?.name || "Anónimo"}
                     </p>
                     <button
@@ -346,7 +449,12 @@ export default function Playlist() {
                         fetchPlaylists();
                         alert("Playlist agregada a tus playlists locales");
                       }}
-                      className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-full shadow transition"
+                      className={
+                        "px-3 py-1 text-xs font-semibold rounded-full shadow transition " +
+                        (darkMode
+                          ? "bg-[#1DB954] text-[#191414] hover:bg-[#191414] hover:text-[#1DB954]"
+                          : "bg-[#191414] text-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414]")
+                      }
                     >
                       ➕ Agregar
                     </button>
@@ -361,13 +469,21 @@ export default function Playlist() {
       {/* Fondo oscuro cuando sidebar está abierto */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40"
+          className={
+            "fixed inset-0 z-40 transition " +
+            (darkMode ? "bg-[#191414]/60" : "bg-[#1DB954]/20")
+          }
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Contenido principal */}
-      <h2 className="text-4xl font-extrabold mb-10 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600">
+      <h2
+        className={
+          "text-4xl font-extrabold mb-10 text-center text-transparent bg-clip-text bg-gradient-to-r " +
+          (darkMode ? "from-[#1DB954] to-white" : "from-[#191414] to-[#1DB954]")
+        }
+      >
         🎵 Mis Playlists
       </h2>
 
@@ -379,7 +495,12 @@ export default function Playlist() {
         <div className="relative w-full md:w-1/2">
           <input
             type="text"
-            className="w-full px-5 py-3 rounded-full bg-gray-900 text-white placeholder-gray-400 border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-400 outline-none"
+            className={
+              "w-full px-5 py-3 rounded-full border outline-none transition " +
+              (darkMode
+                ? "bg-[#282828] text-white placeholder-gray-400 border-[#1DB954] focus:ring-2 focus:ring-[#1DB954]"
+                : "bg-white text-[#191414] placeholder-gray-500 border-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+            }
             placeholder="Nombre de la playlist"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -388,7 +509,12 @@ export default function Playlist() {
         </div>
         <button
           type="submit"
-          className="flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-full shadow transition"
+          className={
+            "flex items-center gap-2 px-6 py-3 font-semibold rounded-full shadow transition " +
+            (darkMode
+              ? "bg-[#1DB954] text-[#191414] hover:bg-[#191414] hover:text-[#1DB954]"
+              : "bg-[#191414] text-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414]")
+          }
         >
           <PlusCircle size={18} />
           {editId ? "Guardar cambios" : "Crear"}
@@ -400,7 +526,12 @@ export default function Playlist() {
               setEditId(null);
               setForm({ name: "" });
             }}
-            className="flex items-center gap-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-full shadow transition"
+            className={
+              "flex items-center gap-2 px-6 py-3 font-semibold rounded-full shadow transition " +
+              (darkMode
+                ? "bg-gray-600 hover:bg-gray-700 text-white"
+                : "bg-gray-300 hover:bg-gray-400 text-[#191414]")
+            }
           >
             <XCircle size={18} /> Cancelar
           </button>
@@ -410,65 +541,107 @@ export default function Playlist() {
       {/* Mis playlists */}
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {playlists.length === 0 ? (
-          <p className="text-gray-400 text-center col-span-full">
+          <p className={
+            "text-center col-span-full " +
+            (darkMode ? "text-[#A7A7A7]" : "text-[#535353]")
+          }>
             No tienes playlists creadas.
           </p>
         ) : (
           playlists.map((pl) => (
             <div
               key={pl._id}
-              className="bg-gradient-to-br from-green-900/40 to-black rounded-2xl shadow-xl p-6 flex flex-col hover:scale-[1.02] hover:shadow-2xl transition"
-            >
+    className={
+      "group flex flex-col rounded-2xl shadow-lg p-0 bg-transparent transition-all duration-200 hover:scale-[1.025] hover:shadow-2xl border-0"
+    }
+    style={{ minHeight: 180 }}
+  >
               {/* Botones de editar y eliminar */}
-              <div className="flex justify-end gap-2 mb-2">
+              <div className="flex justify-end gap-2 pt-4 pr-4">
                 <button
                   onClick={() => {
                     setForm({ name: pl.name });
                     setEditId(pl._id);
                   }}
-                  className="px-3 py-1 bg-yellow-400 text-black text-xs font-semibold rounded-lg hover:bg-yellow-300 transition"
+                  className={
+                    "px-3 py-1 text-xs font-semibold rounded-lg transition " +
+                    (darkMode
+                      ? "bg-yellow-400 text-[#191414] hover:bg-yellow-300"
+                      : "bg-yellow-300 text-[#191414] hover:bg-yellow-400")
+                  }
                   title="Editar nombre"
                 >
                   ✏️
                 </button>
                 <button
                   onClick={() => handleDelete(pl._id)}
-                  className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-400 transition"
+                  className={
+                    "px-3 py-1 text-xs font-semibold rounded-lg transition " +
+                    (darkMode
+                      ? "bg-red-500 text-white hover:bg-red-400"
+                      : "bg-red-400 text-[#191414] hover:bg-red-500")
+                  }
                   title="Eliminar playlist"
                 >
                   🗑
                 </button>
               </div>
-              <h3 className="text-xl font-bold text-green-400 truncate mb-3">
+              <h3 className={
+                "text-xl font-bold truncate px-6 pt-2 pb-1 " +
+                (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+              }>
                 {pl.name}
               </h3>
               <div
-                className="space-y-2 bg-black/40 rounded-xl p-3 overflow-y-auto"
-                style={{ maxHeight: 220 }}
+                className={
+                  "space-y-2 px-4 pb-4 pt-2 overflow-y-auto hide-scrollbar rounded-2xl transition-all duration-200 " +
+                  (darkMode ? "bg-[#181818]" : "bg-[#F5F5F5] border border-[#1DB954]/20")
+                }
+                style={{ maxHeight: 220, scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
                 {(pl.songs || []).length === 0 && (
-                  <p className="text-gray-400 text-sm">Sin canciones</p>
+                  <p className={
+                    "text-sm " +
+                    (darkMode ? "text-[#A7A7A7]" : "text-[#535353]")
+                  }>Sin canciones</p>
                 )}
                 {(pl.songs || []).map((song, idx) => (
                   <div
                     key={song._id || song.spotifyId || idx}
-                    className="flex items-center gap-3 bg-gray-800/60 rounded-lg p-2"
+                    className={
+                      "flex items-center gap-3 rounded-xl p-2 transition-all duration-150 " +
+                      (darkMode
+                        ? "bg-[#232323] group-hover:bg-[#1DB954]/10"
+                        : "bg-white/90 group-hover:bg-[#1DB954]/10 border border-[#1DB954]/10")
+                    }
+                    style={{ boxShadow: darkMode ? '0 1px 4px 0 #0002' : '0 1px 4px 0 #1db95411' }}
                   >
                     <img
                       src={song.cover || "https://via.placeholder.com/60"}
                       alt={song.title}
-                      className="w-10 h-10 rounded object-cover"
+                      className="w-10 h-10 rounded object-cover shadow"
                     />
                     <div className="flex-1">
-                      <p className="text-white text-sm font-semibold truncate">
+                      <p className={
+                        "text-sm font-semibold truncate " +
+                        (darkMode ? "text-white" : "text-[#191414]")
+                      }>
                         {song.title}
                       </p>
-                      <p className="text-gray-400 text-xs truncate">
+                      <p className={
+                        "text-xs truncate " +
+                        (darkMode ? "text-[#A7A7A7]" : "text-[#535353]")
+                      }>
                         {song.artist}
                       </p>
                     </div>
                     <button
-                      className="px-2 py-1 bg-red-500 text-white text-xs rounded-full hover:bg-red-400"
+                      className={
+                        "px-2 py-1 text-xs rounded-full transition " +
+                        (darkMode
+                          ? "bg-red-500 text-white hover:bg-red-400"
+                          : "bg-red-400 text-[#191414] hover:bg-red-500")
+                      }
                       onClick={() =>
                         handleRemoveSong(
                           pl._id,

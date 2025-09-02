@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 import ThemeToggle from "./ThemeToggle";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -41,13 +42,26 @@ const Layout = ({ children }) => {
     navigate("/login");
   };
 
+  const { darkMode } = useContext(ThemeContext);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-900 to-black text-white flex flex-col">
+    <div
+      className={
+        "min-h-screen flex flex-col transition-colors duration-300 " +
+        (darkMode
+          ? "bg-[#121212] text-white" // 🎵 modo oscuro Spotify
+          : "bg-white text-[#191414]") // ☀️ modo claro
+      }
+    >
       {/* NAVBAR FIJO */}
-      <header className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-3 bg-black bg-opacity-80 shadow-lg z-50">
+      <header
+        className={
+          "fixed top-0 left-0 w-full flex items-center justify-between px-6 py-3 shadow-lg z-50 transition-colors duration-300 " +
+          (darkMode ? "bg-[#181818]" : "bg-[#f5f5f5]")
+        }
+      >
         {/* Logo */}
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-          <h1 className="text-2xl font-extrabold tracking-tight text-green-400">🎵 MySpotify</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#1DB954]">🎵 MySpotify</h1>
         </div>
 
         {/* Menú Desktop (solo con perfil y fuera de /profiles) */}
@@ -55,17 +69,17 @@ const Layout = ({ children }) => {
           <nav className="hidden md:flex gap-6 text-sm font-semibold">
             <Link
               to="/songs"
-              className={`hover:text-green-400 transition ${location.pathname === "/songs" ? "text-green-400" : ""}`}
+              className={`hover:text-[#1DB954] transition ${location.pathname === "/songs" ? "text-[#1DB954]" : ""}`}
             >
               Catálogo
             </Link>
             <Link
               to="/playlist"
-              className={`hover:text-green-400 transition ${location.pathname === "/playlist" ? "text-green-400" : ""}`}
+              className={`hover:text-[#1DB954] transition ${location.pathname === "/playlist" ? "text-[#1DB954]" : ""}`}
             >
               Mi Playlist
             </Link>
-            <Link to="/profile" className="btn btn-profile">
+            <Link to="/profile" className="btn btn-profile hover:text-[#1DB954]">
               Ver Perfil
             </Link>
           </nav>
@@ -77,9 +91,9 @@ const Layout = ({ children }) => {
           {showAppNav && (
             <div className="relative">
               <div className="flex items-center gap-2 cursor-pointer" onClick={() => setShowDropdown((v) => !v)}>
-                {profile?.avatar && profile.avatar.startsWith('<svg') ? (
+                {profile?.avatar && profile.avatar.startsWith("<svg") ? (
                   <span
-                    className="w-8 h-8 rounded-full border-2 border-green-400 bg-white flex items-center justify-center"
+                    className="w-8 h-8 rounded-full border-2 border-[#1DB954] bg-white flex items-center justify-center"
                     dangerouslySetInnerHTML={{ __html: profile.avatar }}
                     aria-label={profile?.name}
                   />
@@ -87,31 +101,38 @@ const Layout = ({ children }) => {
                   <img
                     src={profile?.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
                     alt={profile?.name}
-                    className="w-8 h-8 rounded-full border-2 border-green-400 object-cover"
+                    className="w-8 h-8 rounded-full border-2 border-[#1DB954] object-cover"
                   />
                 )}
-                <svg className="w-4 h-4 text-green-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
 
               {showDropdown && profiles.length > 0 && (
-                <div className="absolute right-0 mt-3 bg-gray-900 border border-green-500 rounded-lg shadow-lg z-50 w-56">
+                <div
+                  className={
+                    "absolute right-0 mt-3 border rounded-lg shadow-lg z-50 w-56 transition-colors duration-300 " +
+                    (darkMode ? "bg-[#282828] border-[#1DB954]" : "bg-white border-gray-300")
+                  }
+                >
                   {profiles.map((p) => (
                     <button
                       key={p._id}
-                      className={`flex items-center w-full px-4 py-2 text-left text-sm hover:bg-green-900 transition ${
-                        profile && p._id === profile._id ? "bg-green-800 font-bold" : ""
-                      }`}
+                      className={`flex items-center w-full px-4 py-2 text-left text-sm transition ${
+                        darkMode
+                          ? "hover:bg-[#1DB954]/20"
+                          : "hover:bg-gray-100"
+                      } ${profile && p._id === profile._id ? "bg-[#1DB954]/30 font-bold" : ""}`}
                       onClick={() => {
                         setProfile(p);
                         setShowDropdown(false);
                         navigate("/songs");
                       }}
                     >
-                      {p.avatar && p.avatar.startsWith('<svg') ? (
+                      {p.avatar && p.avatar.startsWith("<svg") ? (
                         <span
-                          className="w-6 h-6 rounded-full mr-2 border border-green-400 bg-white flex items-center justify-center"
+                          className="w-6 h-6 rounded-full mr-2 border border-[#1DB954] bg-white flex items-center justify-center"
                           dangerouslySetInnerHTML={{ __html: p.avatar }}
                           aria-label={p.name}
                         />
@@ -119,15 +140,17 @@ const Layout = ({ children }) => {
                         <img
                           src={p.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
                           alt={p.name}
-                          className="w-6 h-6 rounded-full mr-2 border border-green-400 object-cover"
+                          className="w-6 h-6 rounded-full mr-2 border border-[#1DB954] object-cover"
                         />
                       )}
                       <span>{p.name}</span>
                     </button>
                   ))}
-                  <hr className="border-green-400 my-1" />
+                  <hr className={darkMode ? "border-[#1DB954]/50" : "border-gray-300"} />
                   <button
-                    className="w-full px-4 py-2 text-left text-green-300 hover:bg-green-900 transition rounded-b"
+                    className={`w-full px-4 py-2 text-left transition rounded-b ${
+                      darkMode ? "text-gray-300 hover:bg-[#1DB954]/20" : "text-gray-700 hover:bg-gray-100"
+                    }`}
                     onClick={() => {
                       setShowDropdown(false);
                       navigate("/profiles");
@@ -143,14 +166,17 @@ const Layout = ({ children }) => {
           {/* Usuario (informativo) */}
           {user && (
             <div className="hidden md:flex flex-col text-xs text-right">
-              <span className="text-green-300">Cuenta</span>
+              <span className="text-gray-400">Cuenta</span>
               <span className="font-bold">{user.name || user.email}</span>
             </div>
           )}
 
           {/* Botón logout */}
           {isAuthenticated && (
-            <button onClick={handleLogout} className="hidden md:block px-3 py-1 bg-red-600 hover:bg-red-700 text-xs rounded">
+            <button
+              onClick={handleLogout}
+              className="hidden md:block px-3 py-1 bg-red-600 hover:bg-red-700 text-xs rounded text-white"
+            >
               Cerrar sesión
             </button>
           )}
@@ -164,9 +190,9 @@ const Layout = ({ children }) => {
               onClick={() => setMobileMenu((prev) => !prev)}
               aria-label="Abrir menú"
             >
-              <span className="w-6 h-[2px] bg-green-400"></span>
-              <span className="w-6 h-[2px] bg-green-400"></span>
-              <span className="w-6 h-[2px] bg-green-400"></span>
+              <span className="w-6 h-[2px] bg-[#1DB954]"></span>
+              <span className="w-6 h-[2px] bg-[#1DB954]"></span>
+              <span className="w-6 h-[2px] bg-[#1DB954]"></span>
             </button>
           )}
         </div>
@@ -174,17 +200,22 @@ const Layout = ({ children }) => {
 
       {/* Menú Mobile (solo cuando hay perfil y fuera de /profiles) */}
       {mobileMenu && showAppNav && (
-        <div className="md:hidden absolute top-[60px] left-0 w-full bg-black bg-opacity-90 flex flex-col gap-3 p-4 z-40 text-sm">
-          <Link to="/songs" className="hover:text-green-400" onClick={() => setMobileMenu(false)}>
+        <div
+          className={
+            "md:hidden absolute top-[60px] left-0 w-full flex flex-col gap-3 p-4 z-40 text-sm transition-colors duration-300 " +
+            (darkMode ? "bg-[#181818] text-white" : "bg-white text-[#191414] border-t border-gray-200")
+          }
+        >
+          <Link to="/songs" className="hover:text-[#1DB954]" onClick={() => setMobileMenu(false)}>
             Catálogo
           </Link>
-          <Link to="/playlist" className="hover:text-green-400" onClick={() => setMobileMenu(false)}>
+          <Link to="/playlist" className="hover:text-[#1DB954]" onClick={() => setMobileMenu(false)}>
             Mi Playlist
           </Link>
-          <Link to="/spotify" className="hover:text-green-400" onClick={() => setMobileMenu(false)}>
+          <Link to="/spotify" className="hover:text-[#1DB954]" onClick={() => setMobileMenu(false)}>
             Spotify
           </Link>
-          <Link to="/profile" className="btn btn-profile" onClick={() => setMobileMenu(false)}>
+          <Link to="/profile" className="hover:text-[#1DB954]" onClick={() => setMobileMenu(false)}>
             Ver Perfil
           </Link>
           <button
@@ -192,7 +223,7 @@ const Layout = ({ children }) => {
               handleLogout();
               setMobileMenu(false);
             }}
-            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-xs rounded mt-2"
+            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-xs rounded mt-2 text-white"
           >
             Cerrar sesión
           </button>

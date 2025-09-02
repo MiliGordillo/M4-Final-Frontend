@@ -30,28 +30,30 @@ export default function SongSearchBar({ onResults, onTypeChange }) {
     if (e) e.preventDefault();
     if (!query) return;
     const res = await fetch(
-  `${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${encodeURIComponent(query)}&type=${type}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${encodeURIComponent(
+        query
+      )}&type=${type}`
     );
     const data = await res.json();
     onResults(data);
     onTypeChange(type);
   };
 
-  // Tabs para tipos de búsqueda
   const tabs = [
     { value: "track", label: "Canciones" },
     { value: "artist", label: "Artistas" },
     { value: "album", label: "Álbumes" },
   ];
 
-  // Al hacer click en un tab, buscar aleatorio de ese tipo
   const handleTabClick = async (tabType) => {
     setType(tabType);
     setQuery("");
     onTypeChange(tabType);
     const term = getRandomTerm();
     const res = await fetch(
-  `${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${encodeURIComponent(term)}&type=${tabType}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${encodeURIComponent(
+        term
+      )}&type=${tabType}`
     );
     const data = await res.json();
     onResults(data);
@@ -79,22 +81,25 @@ export default function SongSearchBar({ onResults, onTypeChange }) {
         </span>
         <input
           type="text"
-          className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+          className="w-full pl-10 pr-4 py-2 rounded-full 
+          bg-white dark:bg-gray-800 
+          text-gray-900 dark:text-gray-100 
+          focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
           placeholder="Buscar en el catálogo..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
       {/* Tabs de tipo de búsqueda */}
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1">
+      <div className="flex gap-1 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-1">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             type="button"
             className={`px-4 py-2 rounded-full font-semibold transition text-sm ${
               type === tab.value
-                ? "bg-green-500 text-white shadow"
-                : "bg-transparent text-green-700 dark:text-green-300"
+                ? "bg-emerald-500 text-white shadow"
+                : "text-emerald-600 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900"
             }`}
             onClick={() => handleTabClick(tab.value)}
           >
@@ -105,7 +110,12 @@ export default function SongSearchBar({ onResults, onTypeChange }) {
       {/* Botón buscar */}
       <button
         type="submit"
-        className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-500 text-white font-bold rounded-full shadow transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400"
+        className="flex items-center gap-2 px-5 py-2 
+        bg-gradient-to-r from-emerald-500 to-emerald-400 
+        hover:from-emerald-400 hover:to-emerald-500 
+        text-white font-bold rounded-full shadow 
+        transition-all duration-200 transform hover:scale-105 
+        focus:outline-none focus:ring-2 focus:ring-emerald-400"
       >
         <svg
           width="20"

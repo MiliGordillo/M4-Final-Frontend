@@ -12,13 +12,20 @@ import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout";
 import ArtistDetail from "./components/ArtistDetail";
 import AlbumDetail from "./components/AlbumDetail";
-import PlaylistDetail from "./components/PlaylistDetail";
-import Recommendations from "./components/Recommendations";
 import { AuthProvider } from "./context/AuthContext";
 import { ProfileProvider } from "./context/ProfileContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ForgotPasswordForm from "./components/ForgotPasswordForm";
 import ResetPasswordForm from "./components/ResetPasswordForm";
 import Profile from "./components/Profile";
+
+// Términos aleatorios para la búsqueda inicial
+const randomTerms = [
+  "a", "e", "i", "o", "u", "love", "the", "la", "el", "mi", "yo", "you", "summer", "night", "sun"
+];
+function getRandomTerm() {
+  return randomTerms[Math.floor(Math.random() * randomTerms.length)];
+}
 
 // Contenedor para conectar búsqueda y lista
 const SongCatalogContainer = () => {
@@ -27,19 +34,11 @@ const SongCatalogContainer = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Términos aleatorios para la búsqueda inicial
-  const randomTerms = [
-    "a", "e", "i", "o", "u", "love", "the", "la", "el", "mi", "yo", "you", "summer", "night", "sun"
-  ];
-  function getRandomTerm() {
-    return randomTerms[Math.floor(Math.random() * randomTerms.length)];
-  }
-
   useEffect(() => {
     if (!hasSearched) {
       setLoading(true);
       const term = getRandomTerm();
-  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${term}&type=${type}`)
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${term}&type=${type}`)
         .then(res => res.json())
         .then(data => {
           setSongs(data);
@@ -50,7 +49,7 @@ const SongCatalogContainer = () => {
           setLoading(false);
         });
     }
-  }, [hasSearched, type]); // <-- también depende de type
+  }, [hasSearched, type]);
 
   const handleResults = (results) => {
     setSongs(results);
@@ -87,30 +86,30 @@ function App() {
   return (
     <AuthProvider>
       <ProfileProvider>
-        <Router>
-          <Layout>
-            <Routes>
-              <Route path="/login" element={<LoginForm />} />
-              <Route path="/register" element={<RegisterForm />} />
-              <Route path="/profiles" element={<ProfileSelector />} />
-              <Route path="/songs" element={<PrivateRoute>
-                <SongCatalogContainer />
-              </PrivateRoute>} />
-              <Route path="/playlist" element={<PrivateRoute><Playlist /></PrivateRoute>} />
-              <Route path="/admin/profiles" element={<PrivateRoute><ProfileAdmin /></PrivateRoute>} />
-              <Route path="/song/:id" element={<PrivateRoute><SongDetail /></PrivateRoute>} />
-              <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-              <Route path="/reset-password" element={<ResetPasswordForm />} />
-              <Route path="/track/:trackId" element={<SongDetailWrapper />} />
-              <Route path="/artist/:artistId" element={<ArtistDetailWrapper />} />
-              <Route path="/album/:albumId" element={<AlbumDetailWrapper />} />
-              <Route path="/playlist/:playlistId" element={<PlaylistDetailWrapper />} />
-              <Route path="/recommendations" element={<RecommendationsPage />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="*" element={<Navigate to="/login" />} />
-            </Routes>
-          </Layout>
-        </Router>
+        <ThemeProvider>
+          <Router>
+            <Layout>
+              <Routes>
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/register" element={<RegisterForm />} />
+                <Route path="/profiles" element={<ProfileSelector />} />
+                <Route path="/songs" element={<PrivateRoute>
+                  <SongCatalogContainer />
+                </PrivateRoute>} />
+                <Route path="/playlist" element={<PrivateRoute><Playlist /></PrivateRoute>} />
+                <Route path="/admin/profiles" element={<PrivateRoute><ProfileAdmin /></PrivateRoute>} />
+                <Route path="/song/:id" element={<PrivateRoute><SongDetail /></PrivateRoute>} />
+                <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+                <Route path="/reset-password" element={<ResetPasswordForm />} />
+                <Route path="/track/:trackId" element={<SongDetailWrapper />} />
+                <Route path="/artist/:artistId" element={<ArtistDetailWrapper />} />
+                <Route path="/album/:albumId" element={<AlbumDetailWrapper />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="*" element={<Navigate to="/login" />} />
+              </Routes>
+            </Layout>
+          </Router>
+        </ThemeProvider>
       </ProfileProvider>
     </AuthProvider>
   );
@@ -130,22 +129,6 @@ function ArtistDetailWrapper() {
 function AlbumDetailWrapper() {
   const { albumId } = useParams();
   return <AlbumDetail albumId={albumId} />;
-}
-
-function PlaylistDetailWrapper() {
-  const { playlistId } = useParams();
-  return <PlaylistDetail playlistId={playlistId} />;
-}
-
-function RecommendationsPage() {
-  const [params] = useSearchParams();
-  return (
-    <Recommendations
-      seed_artists={params.get("seed_artists")}
-      seed_tracks={params.get("seed_tracks")}
-      seed_genres={params.get("seed_genres")}
-    />
-  );
 }
 
 export default App;

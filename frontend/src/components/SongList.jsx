@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
 
 export default function SongList({ songs, type, loading }) {
+  const { darkMode } = useContext(ThemeContext);
   const [playlists, setPlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState("");
   const [modalSong, setModalSong] = useState(null);
@@ -153,7 +155,14 @@ export default function SongList({ songs, type, loading }) {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold mb-8 text-green-400">Catálogo</h2>
+      <h2
+        className={
+          `text-3xl font-bold mb-8 ` +
+          (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+        }
+      >
+        Catálogo
+      </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8">
         {/* Canciones */}
         {type === "track" && songs.map(song => (
@@ -163,10 +172,21 @@ export default function SongList({ songs, type, loading }) {
               alt={song.name}
               className="w-36 h-36 rounded-xl object-cover mb-3 transition-transform group-hover:scale-105"
             />
-            <h3 className="text-base font-semibold text-white text-center truncate w-36">{song.name}</h3>
-            <p className="text-xs text-gray-300 text-center truncate w-36">{song.artists?.map(a => a.name).join(", ")}</p>
+            <h3 className={
+              `text-base font-semibold text-center truncate w-36 ` +
+              (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+            }>{song.name}</h3>
+            <p className={
+              `text-xs text-center truncate w-36 ` +
+              (darkMode ? "text-[#A7A7A7]" : "text-[#535353]")
+            }>{song.artists?.map(a => a.name).join(", ")}</p>
             <button
-              className="mt-2 px-4 py-1 bg-green-500 hover:bg-green-400 text-white font-bold rounded-full text-xs transition"
+              className={
+                `mt-2 px-4 py-1 font-bold rounded-full text-xs transition ` +
+                (darkMode
+                  ? "bg-[#191414] text-[#1DB954] border border-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414]"
+                  : "bg-[#1DB954] text-[#191414] border border-[#191414] hover:bg-[#191414] hover:text-[#1DB954]")
+              }
               onClick={() => setModalSong(song)}
             >Agregar a Playlist</button>
           </div>

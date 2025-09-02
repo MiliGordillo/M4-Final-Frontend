@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useProfile } from "../context/ProfileContext";
@@ -7,6 +8,7 @@ import { createAvatar } from "@dicebear/core";
 import { avataaars } from "@dicebear/collection";
 
 function ProfileSelector() {
+  const { darkMode } = useContext(ThemeContext);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -145,13 +147,28 @@ useEffect(() => {
   if (error) return <div className="text-center mt-10 text-red-500">{error}</div>;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh] w-full px-4">
-      <h2 className="text-4xl font-extrabold mb-8 text-green-400 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+    <div
+      className={
+        "flex flex-col items-center justify-center min-h-[70vh] w-full px-4 transition-colors duration-300 " +
+        (darkMode ? "bg-[#121212] text-white" : "bg-white text-[#191414]")
+      }
+    >
+      <h2
+        className={
+          "text-4xl font-extrabold mb-8 text-center " +
+          (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+        }
+      >
         Selecciona tu perfil musical
       </h2>
 
       <button
-        className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 hover:scale-105 transition-transform font-bold"
+        className={
+          "mb-6 px-6 py-2 rounded-xl shadow-lg font-bold transition-all duration-200 " +
+          (darkMode
+            ? "bg-[#1DB954] text-[#191414] hover:bg-[#191414] hover:text-[#1DB954]"
+            : "bg-[#191414] text-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414]")
+        }
         onClick={() => {
           setShowForm(true);
           setEditId(null);
@@ -161,28 +178,36 @@ useEffect(() => {
         + Agregar perfil
       </button>
 
-      <div className="flex gap-8 mb-10 flex-wrap justify-center">
+      <div className="grid gap-4 mb-10 w-full max-w-4xl mx-auto justify-center"
+        style={{
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          justifyItems: 'center',
+        }}
+      >
         {profiles.map((profile) => (
           <div
             key={profile._id}
-            className="flex flex-col items-center bg-gray-900 bg-opacity-70 rounded-2xl p-6 shadow-lg hover:scale-105 hover:shadow-2xl transition-transform cursor-pointer min-w-[180px]"
+            className={
+              "group flex flex-col items-center rounded-2xl shadow-lg p-0 bg-transparent transition-all duration-200 hover:scale-[1.025] hover:shadow-2xl border-0 cursor-pointer min-w-[180px] "
+            }
             onClick={() => handleSelect(profile)}
+            style={{ minHeight: 220 }}
           >
             {profile.avatar && profile.avatar.startsWith("<svg") ? (
               <span
-                className="w-28 h-28 rounded-full mb-4 border-4 border-green-400 bg-white flex items-center justify-center shadow-inner"
+                className="w-28 h-28 rounded-full mt-6 mb-4 border-4 border-[#1DB954] bg-white flex items-center justify-center shadow-inner"
                 dangerouslySetInnerHTML={{ __html: profile.avatar }}
               />
             ) : (
               <img
                 src="https://avatars.dicebear.com/api/avataaars/default.svg"
                 alt={profile.name}
-                className="w-28 h-28 rounded-full mb-4 border-4 border-green-400 object-cover shadow-inner"
+                className="w-28 h-28 rounded-full mt-6 mb-4 border-4 border-[#1DB954] object-cover shadow-inner"
               />
             )}
-            <span className="text-lg font-semibold text-white">{profile.name}</span>
-            <span className="text-sm text-gray-400 mt-1">{profile.type}</span>
-            <div className="flex gap-2 mt-3">
+            <span className={"text-lg font-semibold " + (darkMode ? "text-white" : "text-[#191414]")}>{profile.name}</span>
+            <span className={"text-sm mt-1 " + (darkMode ? "text-[#A7A7A7]" : "text-[#535353]")}>{profile.type}</span>
+            <div className="flex gap-2 mt-3 mb-6">
               <button
                 className="px-3 py-1 bg-yellow-400 text-black rounded-lg text-xs hover:scale-105 transition-transform"
                 onClick={(e) => { e.stopPropagation(); handleEdit(profile); }}
@@ -196,16 +221,26 @@ useEffect(() => {
                 Eliminar
               </button>
             </div>
+            <div
+              className={
+                "w-full px-4 pb-4 pt-2 hide-scrollbar rounded-2xl transition-all duration-200 " +
+                (darkMode ? "bg-[#181818]" : "bg-[#F5F5F5] border border-[#1DB954]/20")
+              }
+              style={{ maxHeight: 0, minHeight: 0, overflow: 'hidden' }}
+            />
           </div>
         ))}
       </div>
 
       {showForm && (
         <form
-          className="bg-gray-900 bg-opacity-80 rounded-2xl shadow-2xl p-6 flex flex-col gap-4 max-w-md w-full mb-8"
+          className={
+            "rounded-2xl shadow-2xl p-6 flex flex-col gap-4 max-w-md w-full mb-8 transition-colors duration-300 " +
+            (darkMode ? "bg-[#181818] text-white" : "bg-[#f5f5f5] text-[#191414]")
+          }
           onSubmit={handleSubmit}
         >
-          <h3 className="text-xl font-bold text-green-300 mb-3">
+          <h3 className={"text-xl font-bold mb-3 " + (darkMode ? "text-[#1DB954]" : "text-[#191414]")}>
             {editId ? "Editar perfil" : "Agregar nuevo perfil"}
           </h3>
 
@@ -213,7 +248,12 @@ useEffect(() => {
             type="text"
             name="name"
             placeholder="Nombre"
-            className="p-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            className={
+              "p-2 rounded-lg border focus:outline-none transition " +
+              (darkMode
+                ? "bg-[#282828] border-[#1DB954] text-white focus:ring-2 focus:ring-[#1DB954]"
+                : "bg-white border-[#191414] text-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+            }
             value={form.name}
             onChange={handleChange}
             required
@@ -221,7 +261,12 @@ useEffect(() => {
 
           <select
             name="type"
-            className="p-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            className={
+              "p-2 rounded-lg border focus:outline-none transition " +
+              (darkMode
+                ? "bg-[#282828] border-[#1DB954] text-white focus:ring-2 focus:ring-[#1DB954]"
+                : "bg-white border-[#191414] text-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+            }
             value={form.type}
             onChange={handleChange}
           >
@@ -234,7 +279,7 @@ useEffect(() => {
             {avatarOptions.map((svg, idx) => (
               <span
                 key={idx}
-                className={`w-16 h-16 rounded-full border-4 cursor-pointer flex items-center justify-center ${form.avatar === svg ? 'border-green-500 shadow-lg' : 'border-gray-500'} hover:scale-110 transition-transform`}
+                className={`w-16 h-16 rounded-full border-4 cursor-pointer flex items-center justify-center ${form.avatar === svg ? 'border-[#1DB954] shadow-lg' : 'border-gray-500'} hover:scale-110 transition-transform`}
                 dangerouslySetInnerHTML={{ __html: svg }}
                 onClick={() => setForm({ ...form, avatar: svg })}
               />
@@ -243,7 +288,12 @@ useEffect(() => {
 
           <select
             name="language"
-            className="p-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            className={
+              "p-2 rounded-lg border focus:outline-none transition " +
+              (darkMode
+                ? "bg-[#282828] border-[#1DB954] text-white focus:ring-2 focus:ring-[#1DB954]"
+                : "bg-white border-[#191414] text-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+            }
             value={form.language}
             onChange={handleChange}
           >
@@ -256,7 +306,12 @@ useEffect(() => {
 
           <select
             name="ageRestriction"
-            className="p-2 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            className={
+              "p-2 rounded-lg border focus:outline-none transition " +
+              (darkMode
+                ? "bg-[#282828] border-[#1DB954] text-white focus:ring-2 focus:ring-[#1DB954]"
+                : "bg-white border-[#191414] text-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+            }
             value={form.ageRestriction}
             onChange={handleChange}
           >
@@ -268,13 +323,23 @@ useEffect(() => {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-bold"
+              className={
+                "px-4 py-2 rounded-xl font-bold transition-colors " +
+                (darkMode
+                  ? "bg-[#1DB954] text-[#191414] hover:bg-[#191414] hover:text-[#1DB954]"
+                  : "bg-[#191414] text-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414]")
+              }
             >
               {editId ? "Guardar cambios" : "Agregar perfil"}
             </button>
             <button
               type="button"
-              className="px-4 py-2 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-colors"
+              className={
+                "px-4 py-2 rounded-xl transition-colors " +
+                (darkMode
+                  ? "bg-gray-500 text-white hover:bg-gray-600"
+                  : "bg-gray-300 text-[#191414] hover:bg-gray-400")
+              }
               onClick={() => {
                 setEditId(null);
                 setForm({ name: "", type: "adult", avatar: "", language: "es", ageRestriction: 18 });
