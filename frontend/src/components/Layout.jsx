@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import ThemeToggle from "./ThemeToggle";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -11,6 +11,20 @@ const Layout = ({ children }) => {
   const { profile, setProfile } = useProfile();
   const [profiles, setProfiles] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  // Cerrar el dropdown al hacer click fuera
+  useEffect(() => {
+    if (!showDropdown) return;
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
   const [mobileMenu, setMobileMenu] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,47 +60,53 @@ const Layout = ({ children }) => {
   return (
     <div
       className={
-        "min-h-screen flex flex-col transition-colors duration-300 " +
+        "min-h-screen flex flex-col transition-colors duration-300 font-sans " +
         (darkMode
-          ? "bg-[#121212] text-white" // 🎵 modo oscuro Spotify
-          : "bg-white text-[#191414]") // ☀️ modo claro
+          ? "bg-gradient-to-br from-[#181818] via-[#121212] to-[#232323] text-white"
+          : "bg-gradient-to-br from-[#f5f5f5] via-white to-[#e9f9ee] text-[#191414]")
       }
     >
       {/* NAVBAR FIJO */}
       <header
         className={
-          "fixed top-0 left-0 w-full flex items-center justify-between px-6 py-3 shadow-lg z-50 transition-colors duration-300 " +
-          (darkMode ? "bg-[#181818]" : "bg-[#f5f5f5]")
+          "fixed top-0 left-0 w-full flex items-center justify-between px-8 py-3 z-50 transition-colors duration-300 backdrop-blur-md bg-opacity-80 border-b " +
+          (darkMode
+            ? "bg-[#181818]/80 border-[#232323] shadow-2xl"
+            : "bg-white/80 border-[#e0e0e0] shadow-xl")
         }
+        style={{boxShadow: darkMode ? '0 4px 24px 0 #0006' : '0 4px 24px 0 #1db95422'}}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#1DB954]">🎵 MySpotify</h1>
+        <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => navigate("/")}> 
+          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#1DB954] shadow-md">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#191414" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 15s1.5-2 4-2 4 2 4 2" /></svg>
+          </span>
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#1DB954] drop-shadow-sm">MySpotify</h1>
         </div>
 
         {/* Menú Desktop (solo con perfil y fuera de /profiles) */}
         {showAppNav && (
-          <nav className="hidden md:flex gap-6 text-sm font-semibold">
+          <nav className="hidden md:flex gap-8 text-base font-semibold">
             <Link
               to="/songs"
-              className={`hover:text-[#1DB954] transition ${location.pathname === "/songs" ? "text-[#1DB954]" : ""}`}
+              className={`px-2 py-1 rounded-lg transition-colors duration-200 ${location.pathname === "/songs" ? "text-[#1DB954] bg-[#1db954]/10" : "hover:text-[#1DB954] hover:bg-[#1db954]/10"}`}
             >
               Catálogo
             </Link>
             <Link
               to="/playlist"
-              className={`hover:text-[#1DB954] transition ${location.pathname === "/playlist" ? "text-[#1DB954]" : ""}`}
+              className={`px-2 py-1 rounded-lg transition-colors duration-200 ${location.pathname === "/playlist" ? "text-[#1DB954] bg-[#1db954]/10" : "hover:text-[#1DB954] hover:bg-[#1db954]/10"}`}
             >
               Mi Playlist
             </Link>
-            <Link to="/profile" className="btn btn-profile hover:text-[#1DB954]">
+            <Link to="/profile" className="px-2 py-1 rounded-lg transition-colors duration-200 hover:text-[#1DB954] hover:bg-[#1db954]/10">
               Ver Perfil
             </Link>
           </nav>
         )}
 
         {/* Lado derecho */}
-        <div className="flex items-center gap-4">
+  <div className="flex items-center gap-5">
           {/* Perfil (dropdown) - solo con perfil y fuera de /profiles */}
           {showAppNav && (
             <div className="relative">
@@ -110,64 +130,74 @@ const Layout = ({ children }) => {
               </div>
 
               {showDropdown && profiles.length > 0 && (
-                <div
-                  className={
-                    "absolute right-0 mt-3 border rounded-lg shadow-lg z-50 w-56 transition-colors duration-300 " +
-                    (darkMode ? "bg-[#282828] border-[#1DB954]" : "bg-white border-gray-300")
-                  }
-                >
-                  {profiles.map((p) => (
-                    <button
-                      key={p._id}
-                      className={`flex items-center w-full px-4 py-2 text-left text-sm transition ${
-                        darkMode
-                          ? "hover:bg-[#1DB954]/20"
-                          : "hover:bg-gray-100"
-                      } ${profile && p._id === profile._id ? "bg-[#1DB954]/30 font-bold" : ""}`}
-                      onClick={() => {
-                        setProfile(p);
-                        setShowDropdown(false);
-                        navigate("/songs");
-                      }}
-                    >
-                      {p.avatar && p.avatar.startsWith("<svg") ? (
-                        <span
-                          className="w-6 h-6 rounded-full mr-2 border border-[#1DB954] bg-white flex items-center justify-center"
-                          dangerouslySetInnerHTML={{ __html: p.avatar }}
-                          aria-label={p.name}
-                        />
-                      ) : (
-                        <img
-                          src={p.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
-                          alt={p.name}
-                          className="w-6 h-6 rounded-full mr-2 border border-[#1DB954] object-cover"
-                        />
-                      )}
-                      <span>{p.name}</span>
-                    </button>
-                  ))}
-                  <hr className={darkMode ? "border-[#1DB954]/50" : "border-gray-300"} />
-                  <button
-                    className={`w-full px-4 py-2 text-left transition rounded-b ${
-                      darkMode ? "text-gray-300 hover:bg-[#1DB954]/20" : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                    onClick={() => {
-                      setShowDropdown(false);
-                      navigate("/profiles");
-                    }}
+                <>
+                  {/* Overlay para cerrar al hacer click fuera */}
+                  <div className="fixed inset-0 z-40" style={{background: "transparent"}} />
+                  <div
+                    ref={dropdownRef}
+                    className={
+                      "absolute right-0 mt-3 border rounded-xl shadow-2xl z-50 w-64 transition-colors duration-300 p-2 " +
+                      (darkMode ? "bg-[#232323] border-[#1DB954]/60" : "bg-white border-gray-200")
+                    }
                   >
-                    Gestionar perfiles
-                  </button>
-                </div>
+                    <div className="max-h-72 overflow-y-auto divide-y divide-[#1DB954]/10">
+                      {profiles.map((p) => (
+                        <button
+                          key={p._id}
+                          className={`flex items-center w-full gap-2 px-4 py-2 text-left text-sm rounded-lg transition font-medium ${
+                            darkMode
+                              ? "hover:bg-[#1DB954]/20 text-white"
+                              : "hover:bg-[#1DB954]/10 text-[#191414]"
+                          } ${profile && p._id === profile._id ? "bg-[#1DB954]/30 font-bold" : ""}`}
+                          onClick={() => {
+                            setProfile(p);
+                            setShowDropdown(false);
+                            navigate("/songs");
+                          }}
+                        >
+                          {p.avatar && p.avatar.startsWith("<svg") ? (
+                            <span
+                              className="w-7 h-7 rounded-full border border-[#1DB954] bg-white flex items-center justify-center"
+                              dangerouslySetInnerHTML={{ __html: p.avatar }}
+                              aria-label={p.name}
+                            />
+                          ) : (
+                            <img
+                              src={p.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
+                              alt={p.name}
+                              className="w-7 h-7 rounded-full border border-[#1DB954] object-cover"
+                            />
+                          )}
+                          <span className="truncate">{p.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="pt-2 mt-2 border-t border-[#1DB954]/20">
+                      <button
+                        className={`w-full px-4 py-2 text-left rounded-lg transition font-semibold ${
+                          darkMode
+                            ? "text-[#1DB954] hover:bg-[#1DB954]/10"
+                            : "text-[#191414] hover:bg-[#1DB954]/10"
+                        }`}
+                        onClick={() => {
+                          setShowDropdown(false);
+                          navigate("/profiles");
+                        }}
+                      >
+                        Gestionar perfiles
+                      </button>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           )}
 
           {/* Usuario (informativo) */}
           {user && (
-            <div className="hidden md:flex flex-col text-xs text-right">
-              <span className="text-gray-400">Cuenta</span>
-              <span className="font-bold">{user.name || user.email}</span>
+            <div className="hidden md:flex flex-col text-xs text-right leading-tight">
+              <span className="text-gray-400 font-medium">Cuenta</span>
+              <span className="font-bold text-sm text-[#1DB954]">{user.name || user.email}</span>
             </div>
           )}
 
@@ -175,7 +205,7 @@ const Layout = ({ children }) => {
           {isAuthenticated && (
             <button
               onClick={handleLogout}
-              className="hidden md:block px-3 py-1 bg-red-600 hover:bg-red-700 text-xs rounded text-white"
+              className="hidden md:block px-4 py-1.5 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-xs rounded-lg text-white font-semibold shadow transition"
             >
               Cerrar sesión
             </button>
@@ -202,20 +232,20 @@ const Layout = ({ children }) => {
       {mobileMenu && showAppNav && (
         <div
           className={
-            "md:hidden absolute top-[60px] left-0 w-full flex flex-col gap-3 p-4 z-40 text-sm transition-colors duration-300 " +
-            (darkMode ? "bg-[#181818] text-white" : "bg-white text-[#191414] border-t border-gray-200")
+            "md:hidden absolute top-[60px] left-0 w-full flex flex-col gap-3 p-5 z-40 text-base font-semibold rounded-b-2xl shadow-2xl transition-colors duration-300 " +
+            (darkMode ? "bg-[#181818]/95 text-white border-t border-[#1DB954]/20" : "bg-white/95 text-[#191414] border-t border-[#1DB954]/10")
           }
         >
-          <Link to="/songs" className="hover:text-[#1DB954]" onClick={() => setMobileMenu(false)}>
+          <Link to="/songs" className="px-3 py-2 rounded-lg hover:bg-[#1DB954]/10 transition" onClick={() => setMobileMenu(false)}>
             Catálogo
           </Link>
-          <Link to="/playlist" className="hover:text-[#1DB954]" onClick={() => setMobileMenu(false)}>
+          <Link to="/playlist" className="px-3 py-2 rounded-lg hover:bg-[#1DB954]/10 transition" onClick={() => setMobileMenu(false)}>
             Mi Playlist
           </Link>
-          <Link to="/spotify" className="hover:text-[#1DB954]" onClick={() => setMobileMenu(false)}>
+          <Link to="/spotify" className="px-3 py-2 rounded-lg hover:bg-[#1DB954]/10 transition" onClick={() => setMobileMenu(false)}>
             Spotify
           </Link>
-          <Link to="/profile" className="hover:text-[#1DB954]" onClick={() => setMobileMenu(false)}>
+          <Link to="/profile" className="px-3 py-2 rounded-lg hover:bg-[#1DB954]/10 transition" onClick={() => setMobileMenu(false)}>
             Ver Perfil
           </Link>
           <button
@@ -223,7 +253,7 @@ const Layout = ({ children }) => {
               handleLogout();
               setMobileMenu(false);
             }}
-            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-xs rounded mt-2 text-white"
+            className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-xs rounded-lg mt-2 text-white font-semibold shadow"
           >
             Cerrar sesión
           </button>
@@ -231,7 +261,9 @@ const Layout = ({ children }) => {
       )}
 
       {/* MAIN */}
-      <main className="flex-1 pt-20 max-w-6xl mx-auto py-6 px-4 w-full">{children}</main>
+      <main className="flex-1 pt-24 max-w-6xl mx-auto py-10 px-6 w-full rounded-2xl shadow-lg bg-white/80 dark:bg-[#181818]/80 transition-all duration-300 mt-4">
+        {children}
+      </main>
     </div>
   );
 };
