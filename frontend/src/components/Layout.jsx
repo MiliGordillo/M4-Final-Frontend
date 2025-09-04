@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
+import ProfileSwitchLoader from "./ProfileSwitchLoader";
 import { ThemeContext } from "../context/ThemeContext";
 import ThemeToggle from "./ThemeToggle";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -11,6 +12,8 @@ const Layout = ({ children }) => {
   const { profile, setProfile } = useProfile();
   const [profiles, setProfiles] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [switchingProfile, setSwitchingProfile] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const dropdownRef = useRef(null);
   // Cerrar el dropdown al hacer click fuera
   useEffect(() => {
@@ -51,9 +54,13 @@ const Layout = ({ children }) => {
   }, [isAuthenticated, isOnProfiles]);
 
   const handleLogout = () => {
-    setProfile(null); // limpiar perfil guardado
-    logout();
-    navigate("/login");
+    setLoggingOut(true);
+    setTimeout(() => {
+      setProfile(null); // limpiar perfil guardado
+      logout();
+      setLoggingOut(false);
+      navigate("/login");
+    }, 1200);
   };
 
   const { darkMode } = useContext(ThemeContext);
@@ -155,10 +162,15 @@ const Layout = ({ children }) => {
                               ? "hover:bg-[#1DB954]/20 text-white"
                               : "hover:bg-[#1DB954]/10 text-[#191414]"
                           } ${profile && p._id === profile._id ? "bg-[#1DB954]/30 font-bold" : ""}`}
-                          onClick={() => {
-                            setProfile(p);
+                          onClick={async () => {
+                            setSwitchingProfile(true);
                             setShowDropdown(false);
-                            navigate("/songs");
+                            // Simula animación de cambio de perfil
+                            setTimeout(() => {
+                              setProfile(p);
+                              setSwitchingProfile(false);
+                              navigate("/songs");
+                            }, 1200);
                           }}
                         >
                           {p.avatar && p.avatar.startsWith("<svg") ? (
@@ -267,6 +279,7 @@ const Layout = ({ children }) => {
       )}
 
       {/* MAIN */}
+  <ProfileSwitchLoader show={switchingProfile || loggingOut} message={loggingOut ? "Cerrando sesión..." : undefined} />
       <main className="flex-1 pt-24 max-w-6xl mx-auto py-10 px-6 w-full transition-all duration-300 mt-4">
         <div className={
           (darkMode
