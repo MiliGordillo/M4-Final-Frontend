@@ -44,6 +44,13 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setIsAuthenticated(false);
     setUser(null);
+    // Limpiar notificaciones pendientes de react-toastify
+    try {
+      const { toast } = require("react-toastify");
+      toast.dismiss();
+    } catch (e) {
+      // Si no se puede limpiar, no hacer nada
+    }
   };
 
   return (
