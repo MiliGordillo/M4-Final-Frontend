@@ -1,4 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../toast-custom.css";
 import { ThemeContext } from "../context/ThemeContext";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -95,14 +98,25 @@ export default function SongList({ songs, type, loading }) {
   // Manejar agregar artista a favoritos
   const handleAddArtistFavorite = async (artist) => {
     if (isArtistFavorite(artist.id)) return;
+    const artistToSave = { ...artist, id: artist.id };
     try {
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-artist`,
-        { artist },
+        { artist: artistToSave },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       await fetchFavorites();
+      toast.success("¡Artista guardado como favorito!", {
+        icon: "💚",
+        className: darkMode ? "toast-dark" : "toast-light",
+        progressClassName: darkMode ? "bg-[#1DB954]" : "bg-[#1DB954]"
+      });
     } catch (err) {
+      toast.error("No se pudo guardar el artista como favorito", {
+        icon: "❌",
+        className: darkMode ? "toast-dark-error" : "toast-light-error",
+        progressClassName: darkMode ? "bg-red-500" : "bg-red-500"
+      });
       console.error("Error al agregar artista favorito:", err);
     }
   };
@@ -110,14 +124,25 @@ export default function SongList({ songs, type, loading }) {
   // Manejar agregar álbum a favoritos
   const handleAddAlbumFavorite = async (album) => {
     if (isAlbumFavorite(album.id)) return;
+    const albumToSave = { ...album, id: album.id };
     try {
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-album`,
-        { album },
+        { album: albumToSave },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       await fetchFavorites();
+      toast.success("¡Álbum guardado como favorito!", {
+        icon: "💚",
+        className: darkMode ? "toast-dark" : "toast-light",
+        progressClassName: darkMode ? "bg-[#1DB954]" : "bg-[#1DB954]"
+      });
     } catch (err) {
+      toast.error("No se pudo guardar el álbum como favorito", {
+        icon: "❌",
+        className: darkMode ? "toast-dark-error" : "toast-light-error",
+        progressClassName: darkMode ? "bg-red-500" : "bg-red-500"
+      });
       console.error("Error al agregar álbum favorito:", err);
     }
   };
@@ -155,6 +180,7 @@ export default function SongList({ songs, type, loading }) {
 
   return (
     <div>
+      <ToastContainer position="top-right" autoClose={2500} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
       <h2
         className={
           `text-3xl font-bold mb-8 ` +

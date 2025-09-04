@@ -77,7 +77,13 @@ const Layout = ({ children }) => {
         style={{boxShadow: darkMode ? '0 4px 24px 0 #0006' : '0 4px 24px 0 #1db95422'}}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => navigate("/")}> 
+        <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => {
+          if (token) {
+            navigate("/songs");
+          } else {
+            navigate("/login");
+          }
+        }}>
           <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#1DB954] shadow-md">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#191414" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 15s1.5-2 4-2 4 2 4 2" /></svg>
           </span>
@@ -261,8 +267,14 @@ const Layout = ({ children }) => {
       )}
 
       {/* MAIN */}
-      <main className="flex-1 pt-24 max-w-6xl mx-auto py-10 px-6 w-full rounded-2xl shadow-lg bg-white/80 dark:bg-[#181818]/80 transition-all duration-300 mt-4">
-        {children}
+      <main className="flex-1 pt-24 max-w-6xl mx-auto py-10 px-6 w-full transition-all duration-300 mt-4">
+        <div className={
+          (darkMode
+            ? "text-white"
+            : "text-[#191414]")
+        }>
+          {children}
+        </div>
       </main>
     </div>
   );

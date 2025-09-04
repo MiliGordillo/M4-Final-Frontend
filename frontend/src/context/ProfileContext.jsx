@@ -32,13 +32,18 @@ export const useProfile = () => useContext(ProfileContext);
 function useFavoriteActions(profile) {
   const { token } = useAuth();
 
-  const saveFavoriteArtist = async (artistId) => {
+  const saveFavoriteArtist = async (artist) => {
+    const artistToSave = {
+      id: artist.id,
+      name: artist.name,
+      images: artist.images
+    };
     const res = await axios.put(
       `${import.meta.env.VITE_BACKEND_URL}/api/profiles/${profile._id}/favorite-artist`,
-      { artistId },
+      { artist: artistToSave },
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    setProfileState((prev) => ({ ...prev, favoriteArtist: artistId }));
+    // Puedes actualizar el estado aquí si lo necesitas
   };
 
   const saveFavoriteAlbum = async (albumId) => {

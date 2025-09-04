@@ -32,7 +32,7 @@ export default function SongSearchBar({ onResults, onTypeChange }) {
     const res = await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${encodeURIComponent(
         query
-      )}&type=${type}`
+      )}&type=${type}&limit=10`
     );
     const data = await res.json();
     onResults(data);
@@ -53,7 +53,7 @@ export default function SongSearchBar({ onResults, onTypeChange }) {
     const res = await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${encodeURIComponent(
         term
-      )}&type=${tabType}`
+      )}&type=${tabType}&limit=10`
     );
     const data = await res.json();
     onResults(data);

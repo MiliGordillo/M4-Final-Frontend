@@ -1,0 +1,29 @@
+/* Notificaciones personalizadas para react-toastify */
+.toast-dark {
+  background: #191414 !important;
+  color: #1DB954 !important;
+  border-left: 4px solid #1DB954 !important;
+  font-weight: bold;
+  box-shadow: 0 2px 16px 0 #1db95422 !important;
+}
+.toast-dark-error {
+  background: #191414 !important;
+  color: #ff4d4f !important;
+  border-left: 4px solid #ff4d4f !important;
+  font-weight: bold;
+  box-shadow: 0 2px 16px 0 #ff4d4f22 !important;
+}
+.toast-light {
+  background: #fff !important;
+  color: #191414 !important;
+  border-left: 4px solid #1DB954 !important;
+  font-weight: bold;
+  box-shadow: 0 2px 16px 0 #1db95422 !important;
+}
+.toast-light-error {
+  background: #fff !important;
+  color: #191414 !important;
+  border-left: 4px solid #ff4d4f !important;
+  font-weight: bold;
+  box-shadow: 0 2px 16px 0 #ff4d4f22 !important;
+}

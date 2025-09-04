@@ -12,6 +12,9 @@ const ResetPasswordForm = () => {
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
 
+  // Mostrar error inmediato si no hay token
+  const noToken = !token;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -67,48 +70,56 @@ const ResetPasswordForm = () => {
       >
         Restablecer contraseña
       </h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="password"
-          placeholder="Nueva contraseña"
-          className={
-            "p-3 rounded-lg border focus:outline-none transition " +
-            (darkMode
-              ? "bg-[#282828] border-[#1DB954] text-white focus:ring-2 focus:ring-[#1DB954]"
-              : "bg-[#f5f5f5] border-[#191414] text-[#191414] focus:ring-2 focus:ring-[#1DB954]")
-          }
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Confirmar contraseña"
-          className={
-            "p-3 rounded-lg border focus:outline-none transition " +
-            (darkMode
-              ? "bg-[#282828] border-[#1DB954] text-white focus:ring-2 focus:ring-[#1DB954]"
-              : "bg-[#f5f5f5] border-[#191414] text-[#191414] focus:ring-2 focus:ring-[#1DB954]")
-          }
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          required
-        />
-        <button
-          type="submit"
-          className={
-            "font-bold py-2 rounded shadow transition-all duration-200 focus:outline-none focus:ring-2 " +
-            (darkMode
-              ? "bg-[#1DB954] text-[#191414] hover:bg-[#191414] hover:text-[#1DB954] focus:ring-[#1DB954]"
-              : "bg-[#191414] text-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414] focus:ring-[#1DB954]")
-          }
-          disabled={loading}
-        >
-          {loading ? "Restableciendo..." : "Restablecer contraseña"}
-        </button>
-      </form>
-      {message && <div className="text-[#1DB954] mt-4">{message}</div>}
-      {error && <div className="text-red-400 mt-4">{error}</div>}
+      {noToken ? (
+        <div className="text-red-500 text-center font-semibold py-8">
+          Enlace inválido o expirado. Solicita un nuevo restablecimiento de contraseña.
+        </div>
+      ) : (
+        <>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <input
+              type="password"
+              placeholder="Nueva contraseña"
+              className={
+                "p-3 rounded-lg border focus:outline-none transition " +
+                (darkMode
+                  ? "bg-[#282828] border-[#1DB954] text-white focus:ring-2 focus:ring-[#1DB954]"
+                  : "bg-[#f5f5f5] border-[#191414] text-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+              }
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Confirmar contraseña"
+              className={
+                "p-3 rounded-lg border focus:outline-none transition " +
+                (darkMode
+                  ? "bg-[#282828] border-[#1DB954] text-white focus:ring-2 focus:ring-[#1DB954]"
+                  : "bg-[#f5f5f5] border-[#191414] text-[#191414] focus:ring-2 focus:ring-[#1DB954]")
+              }
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+            />
+            <button
+              type="submit"
+              className={
+                "font-bold py-2 rounded shadow transition-all duration-200 focus:outline-none focus:ring-2 " +
+                (darkMode
+                  ? "bg-[#1DB954] text-[#191414] hover:bg-[#191414] hover:text-[#1DB954] focus:ring-[#1DB954]"
+                  : "bg-[#191414] text-[#1DB954] hover:bg-[#1DB954] hover:text-[#191414] focus:ring-[#1DB954]")
+              }
+              disabled={loading}
+            >
+              {loading ? "Restableciendo..." : "Restablecer contraseña"}
+            </button>
+          </form>
+          {message && <div className="text-[#1DB954] mt-4">{message}</div>}
+          {error && <div className="text-red-400 mt-4">{error}</div>}
+        </>
+      )}
     </div>
   );
 };

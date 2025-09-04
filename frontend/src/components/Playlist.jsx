@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { ThemeContext } from "../context/ThemeContext";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -80,13 +82,23 @@ export default function Playlist() {
         await axios.put(
           `${import.meta.env.VITE_BACKEND_URL}/api/playlists/edit/${editId}`,
           { name: form.name },
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'x-profile-id': profile?._id,
+            },
+          }
         );
       } else {
         await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/api/playlists/${profile._id}`,
           { name: form.name },
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'x-profile-id': profile?._id,
+            },
+          }
         );
       }
       setForm({ name: "" });
@@ -98,14 +110,36 @@ export default function Playlist() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("¿Seguro que deseas eliminar esta playlist?")) return;
+    const result = await Swal.fire({
+      title: '¿Seguro que deseas eliminar esta playlist?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1DB954',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+    });
+    if (!result.isConfirmed) return;
     try {
-  await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/delete/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchPlaylists();
+      toast.success("Playlist eliminada correctamente", {
+        icon: "🗑️",
+        className: darkMode
+          ? "bg-[#191414] !important text-[#1DB954] font-bold border-l-4 border-[#1DB954] !important shadow-lg !important"
+          : "bg-[#1DB954] text-[#191414] font-bold border-l-4 border-[#191414]",
+        progressClassName: darkMode ? "bg-[#1DB954]" : "bg-[#191414]"
+      });
     } catch {
-      setError("No se pudo eliminar la playlist");
+      toast.error("No se pudo eliminar la playlist", {
+        icon: "❌",
+        className: darkMode
+          ? "bg-[#191414] !important text-red-400 font-bold border-l-4 border-red-500 !important shadow-lg !important"
+          : "bg-red-200 text-[#191414] font-bold border-l-4 border-red-500",
+        progressClassName: darkMode ? "bg-red-500" : "bg-red-500"
+      });
     }
   };
 
@@ -147,14 +181,23 @@ export default function Playlist() {
   // --- Add Spotify Playlist ---
   const handleAddSpotifyPlaylist = async (pl) => {
     if (profile?.type === "child") {
-      alert("No tienes permiso para importar playlists de Spotify.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Sin permiso',
+        text: 'No tienes permiso para importar playlists de Spotify.'
+      });
       return;
     }
     try {
       // 1. Obtener los tracks de la playlist de Spotify desde tu backend
       const tracksRes = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/spotify/playlist/${pl.id}/tracks`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-profile-id': profile?._id,
+          },
+        }
       );
 
       // 2. Formatear los tracks
@@ -175,46 +218,88 @@ export default function Playlist() {
           fromSpotify: true,
           spotifyId: pl.id,
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-profile-id': profile?._id,
+          },
+        }
       );
       fetchPlaylists();
-      alert("Playlist de Spotify agregada a tus playlists locales");
-    } catch (error) {
-      alert("No se pudo agregar la playlist de Spotify");
+      toast.success("Playlist de Spotify agregada a tus playlists locales", {
+        icon: "🎶",
+        className: darkMode
+          ? "bg-[#191414] !important text-[#1DB954] font-bold border-l-4 border-[#1DB954] !important shadow-lg !important"
+          : "bg-[#191414] text-[#1DB954] font-bold border-l-4 border-[#1DB954]",
+        progressClassName: darkMode ? "bg-[#1DB954]" : "bg-[#1DB954]"
+      });
+    } catch {
+      toast.error("No se pudo agregar la playlist de Spotify", {
+        icon: "❌",
+        className: darkMode
+          ? "bg-[#191414] !important text-red-400 font-bold border-l-4 border-red-500 !important shadow-lg !important"
+          : "bg-red-200 text-[#191414] font-bold border-l-4 border-red-500",
+        progressClassName: darkMode ? "bg-red-500" : "bg-red-500"
+      });
     }
   };
 
   const handleRemoveSong = async (playlistId, songId) => {
-    if (!window.confirm("¿Seguro que deseas eliminar esta canción?")) return;
+    const result = await Swal.fire({
+      title: '¿Seguro que deseas eliminar esta canción?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1DB954',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+    });
+    if (!result.isConfirmed) return;
     try {
-  await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/${playlistId}/song/${songId}`, {
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/playlists/${playlistId}/song/${songId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchPlaylists();
+      toast.success("Canción eliminada correctamente", {
+        icon: "🗑️",
+        className: darkMode
+          ? "bg-[#191414] !important text-[#1DB954] font-bold border-l-4 border-[#1DB954] !important shadow-lg !important"
+          : "bg-[#1DB954] text-[#191414] font-bold border-l-4 border-[#191414]",
+        progressClassName: darkMode ? "bg-[#1DB954]" : "bg-[#191414]"
+      });
     } catch {
-      alert("No se pudo eliminar la canción");
+      toast.error("No se pudo eliminar la canción", {
+        icon: "❌",
+        className: darkMode
+          ? "bg-[#191414] !important text-red-400 font-bold border-l-4 border-red-500 !important shadow-lg !important"
+          : "bg-red-200 text-[#191414] font-bold border-l-4 border-red-500",
+        progressClassName: darkMode ? "bg-red-500" : "bg-red-500"
+      });
     }
   };
 
   // --- Render ---
   if (loading)
     return (
-      <div className={
-        "flex flex-col items-center justify-center min-h-[40vh] animate-pulse " +
-        (darkMode ? "text-[#1DB954]" : "text-[#191414]")
-      }>
+      <div
+        className={
+          "flex flex-col items-center justify-center min-h-[40vh] animate-pulse " +
+          (darkMode ? "text-[#1DB954]" : "text-[#191414]")
+        }
+      >
         <Loader2 className="w-6 h-6 animate-spin mb-2" />
         Cargando playlists...
-      </div>
-    );
-
-  if (error)
-    return (
-      <div className={
-        "flex flex-col items-center justify-center min-h-[40vh] font-semibold " +
-        (darkMode ? "text-red-400" : "text-red-600")
-      }>
-        {error}
+        {error && (
+          <div
+            className={
+              "mt-4 text-center text-sm " +
+              (darkMode ? "text-red-400" : "text-red-600")
+            }
+          >
+            {error}
+          </div>
+        )}
+  {/* ToastContainer global en App.jsx */}
       </div>
     );
 
@@ -222,9 +307,10 @@ export default function Playlist() {
     <div
       className={
         "relative max-w-7xl mx-auto px-4 md:px-10 py-10 transition-colors duration-300 " +
-        (darkMode ? "bg-[#121212] text-white" : "bg-white text-[#191414]")
+        (darkMode ? "bg-transparent text-white" : "bg-transparent text-[#191414]")
       }
     >
+  {/* ToastContainer global en App.jsx */}
       {/* Botón flotante para abrir sidebar */}
       <button
         onClick={() => setSidebarOpen(true)}
@@ -444,7 +530,12 @@ export default function Playlist() {
                             fromCommunity: true,
                             originalPlaylist: pl._id,
                           },
-                          { headers: { Authorization: `Bearer ${token}` } }
+                          {
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                              'x-profile-id': profile?._id,
+                            },
+                          }
                         );
                         fetchPlaylists();
                         alert("Playlist agregada a tus playlists locales");
@@ -551,11 +642,14 @@ export default function Playlist() {
           playlists.map((pl) => (
             <div
               key={pl._id}
-    className={
-      "group flex flex-col rounded-2xl shadow-lg p-0 bg-transparent transition-all duration-200 hover:scale-[1.025] hover:shadow-2xl border-0"
-    }
-    style={{ minHeight: 180 }}
-  >
+              className={
+                "group flex flex-col rounded-2xl shadow-lg p-0 transition-all duration-200 hover:scale-[1.025] hover:shadow-2xl border-2 my-8 " +
+                (darkMode
+                  ? "border-[#1DB954] bg-black/40"
+                  : "border-[#1DB954] bg-white/80")
+              }
+              style={{ minHeight: 180, boxShadow: '0 2px 16px 0 #1db95422' }}
+            >
               {/* Botones de editar y eliminar */}
               <div className="flex justify-end gap-2 pt-4 pr-4">
                 <button

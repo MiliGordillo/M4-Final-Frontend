@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useSearchParams } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
@@ -7,11 +9,8 @@ import ProfileSelector from "./components/ProfileSelector";
 import SongList from "./components/SongList";
 import Playlist from "./components/Playlist";
 import ProfileAdmin from "./components/ProfileAdmin";
-import SongDetail from "./components/SongDetail";
 import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout";
-import ArtistDetail from "./components/ArtistDetail";
-import AlbumDetail from "./components/AlbumDetail";
 import { AuthProvider } from "./context/AuthContext";
 import { ProfileProvider } from "./context/ProfileContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -37,8 +36,8 @@ const SongCatalogContainer = () => {
   useEffect(() => {
     if (!hasSearched) {
       setLoading(true);
-      const term = getRandomTerm();
-      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${term}&type=${type}`)
+      const term = 'a'; // Término común para asegurar más resultados
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/spotify/search?q=${term}&type=${type}&limit=10`)
         .then(res => res.json())
         .then(data => {
           setSongs(data);
@@ -62,19 +61,20 @@ const SongCatalogContainer = () => {
     setHasSearched(false); // Para que busque aleatorio al cambiar tipo
   };
 
+  // Limitar a 10 resultados para todos los tipos
+  let limitedSongs = [];
+  if (type === "track") {
+    limitedSongs = (songs.tracks?.items || []).slice(0, 10);
+  } else if (type === "artist") {
+    limitedSongs = (songs.artists?.items || []).slice(0, 10);
+  } else if (type === "album") {
+    limitedSongs = (songs.albums?.items || []).slice(0, 10);
+  }
   return (
     <>
       <SongSearchBar onResults={handleResults} onTypeChange={handleTypeChange} />
       <SongList
-        songs={
-          type === "track"
-            ? (songs.tracks?.items || [])
-            : type === "artist"
-            ? (songs.artists?.items || [])
-            : type === "album"
-            ? (songs.albums?.items || [])
-            : []
-        }
+        songs={limitedSongs}
         type={type}
         loading={loading}
       />
@@ -98,12 +98,8 @@ function App() {
                 </PrivateRoute>} />
                 <Route path="/playlist" element={<PrivateRoute><Playlist /></PrivateRoute>} />
                 <Route path="/admin/profiles" element={<PrivateRoute><ProfileAdmin /></PrivateRoute>} />
-                <Route path="/song/:id" element={<PrivateRoute><SongDetail /></PrivateRoute>} />
                 <Route path="/forgot-password" element={<ForgotPasswordForm />} />
                 <Route path="/reset-password" element={<ResetPasswordForm />} />
-                <Route path="/track/:trackId" element={<SongDetailWrapper />} />
-                <Route path="/artist/:artistId" element={<ArtistDetailWrapper />} />
-                <Route path="/album/:albumId" element={<AlbumDetailWrapper />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<Navigate to="/login" />} />
               </Routes>
@@ -115,22 +111,4 @@ function App() {
   );
 }
 
-// Wrappers para extraer params de la URL
-function SongDetailWrapper() {
-  const { trackId } = useParams();
-  return <SongDetail trackId={trackId} />;
-}
-
-function ArtistDetailWrapper() {
-  const { artistId } = useParams();
-  return <ArtistDetail artistId={artistId} />;
-}
-
-function AlbumDetailWrapper() {
-  const { albumId } = useParams();
-  return <AlbumDetail albumId={albumId} />;
-}
-
 export default App;
-
-// (Node.js backend code removed from frontend React file)
