@@ -103,6 +103,18 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<Navigate to="/login" />} />
               </Routes>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              />
             </Layout>
           </Router>
         </ThemeProvider>

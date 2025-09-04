@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { toast } from "react-toastify";
 import { ThemeContext } from "../context/ThemeContext";
 
 const ForgotPasswordForm = () => {
@@ -23,13 +24,19 @@ const ForgotPasswordForm = () => {
       const data = await res.json();
       console.log("Respuesta del backend:", data); // <-- Verifica la respuesta
       if (!res.ok) {
-        alert(data.message || "Ocurrió un error");
+        toast.error(data.message || "Ocurrió un error", {
+          className: darkMode ? "toast-dark-error" : "toast-light-error",
+        });
       } else {
-        alert("¡Correo enviado!");
+        toast.success("¡Correo enviado!", {
+          className: darkMode ? "toast-dark" : "toast-light",
+        });
       }
     } catch (err) {
       console.log("Error en fetch:", err);
-      alert("Ocurrió un error en la petición");
+      toast.error("Ocurrió un error en la petición", {
+        className: darkMode ? "toast-dark-error" : "toast-light-error",
+      });
     }
     setLoading(false);
   };
@@ -86,6 +93,3 @@ const ForgotPasswordForm = () => {
 };
 
 export default ForgotPasswordForm;
-
-// Backend logic removed from frontend React component.
-// Please move the forgotPassword handler to your backend/server codebase (e.g., in an Express route file).

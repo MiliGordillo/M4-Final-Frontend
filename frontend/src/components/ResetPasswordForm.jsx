@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { toast } from "react-toastify";
 import { ThemeContext } from "../context/ThemeContext";
 
 const ResetPasswordForm = () => {
@@ -43,6 +44,9 @@ const ResetPasswordForm = () => {
       const data = await res.json();
       if (res.ok) {
         setMessage("¡Contraseña restablecida correctamente! Ahora puedes iniciar sesión.");
+        toast.success("¡Contraseña restablecida correctamente!", {
+          className: darkMode ? "toast-dark" : "toast-light",
+        });
       } else {
         setError(data.message || "Ocurrió un error.");
       }
